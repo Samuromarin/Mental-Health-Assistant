@@ -69,6 +69,13 @@ def create_default_assets():
         except Exception as e:
             print(f"⚠️ No se pudo crear el logo: {e}")
 
+def get_gradio_version():
+    """Obtiene la versión de Gradio instalada"""
+    try:
+        return float(gr.__version__.split('.')[0])
+    except (AttributeError, ValueError, IndexError):
+        return 0  # No se pudo determinar la versión
+
 def main():
     """Función principal"""
     try:
@@ -121,14 +128,33 @@ def main():
         print("💡 Presiona Ctrl+C para detener el asistente")
         print("=" * 50 + "\n")
         
+        # Verificar la versión de Gradio para compatibilidad
+        gradio_version = get_gradio_version()
+        
+        # Activar la cola de forma compatible con la versión
+        try:
+            if gradio_version >= 3:
+                # Versión 3.x o superior, que podría tener concurrency_count
+                try:
+                    demo.queue(concurrency_count=5)
+                except TypeError:
+                    # Fallback si no tiene concurrency_count
+                    demo.queue()
+            else:
+                # Versión anterior
+                demo.queue()
+        except Exception as e:
+            print(f"⚠️ No se pudo activar la cola de Gradio: {e}")
+            print("Continuando sin cola...")
+        
         # Iniciar la interfaz
-        demo.queue(concurrency_count=5)  # Permitir varias solicitudes simultáneas
         demo.launch(
             server_name=args.host,
             server_port=args.port,
             share=args.share,
             debug=args.debug,
-            show_error=args.debug
+            # Usar show_error solo si está disponible (versiones más recientes)
+            **({"show_error": args.debug} if hasattr(gr, "__version__") and gr.__version__ >= "3.0" else {})
         )
         
         return 0
