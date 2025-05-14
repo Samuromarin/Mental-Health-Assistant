@@ -1,6 +1,11 @@
-import gradio as gr
+"""
+Interfaz de usuario para el asistente de salud mental usando Gradio
+"""
+
 import os
 import sys
+import gradio as gr
+from typing import Dict, Any, List, Tuple
 
 # Añadir el directorio raíz al path para importaciones relativas
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,7 +15,12 @@ from src.config.settings import MENTAL_HEALTH_CATEGORIES, RESOURCES, GROQ_MODELS
 from src.utils.safety import detect_crisis, get_crisis_response
 
 def create_mental_health_interface():
-    """Crea la interfaz de usuario para el asistente de salud mental usando GroqCloud"""
+    """
+    Crea la interfaz de usuario para el asistente de salud mental usando GroqCloud
+    
+    Returns:
+        Objeto Gradio para lanzar la interfaz
+    """
     
     # Crear cliente de GroqCloud
     try:
@@ -18,10 +28,50 @@ def create_mental_health_interface():
         available_models = client.get_available_models()
     except Exception as e:
         print(f"Error al inicializar el cliente de GroqCloud: {e}")
-        available_models = list(GROQ_MODELS.keys())
+        available_models = list(GROQ_MODELS.keys()) if GROQ_MODELS else ["llama2-70b-4096"]
+    
+    # Ejemplos de preguntas por categoría para mejorar la experiencia de usuario
+    examples = {
+        "General": [
+            "¿Podrías darme algunos consejos para mejorar mi bienestar emocional?",
+            "¿Qué hábitos diarios son buenos para la salud mental?",
+            "¿Cómo puedo saber si necesito ayuda profesional?"
+        ],
+        "Ansiedad": [
+            "Últimamente me siento ansioso. ¿Podrías ayudarme?",
+            "¿Cómo puedo manejar los ataques de pánico?",
+            "¿Qué técnicas de respiración son buenas para la ansiedad?"
+        ],
+        "Depresión": [
+            "He estado sintiéndome sin energía y con poco interés en las cosas",
+            "¿Cómo puedo lidiar con pensamientos negativos recurrentes?",
+            "Me cuesta levantarme por las mañanas. ¿Qué puedo hacer?"
+        ],
+        "Estrés": [
+            "El trabajo me está causando mucho estrés, ¿cómo puedo manejarlo?",
+            "Necesito técnicas para relajarme después de un día difícil",
+            "¿Qué ejercicios rápidos me ayudarían a reducir el estrés?"
+        ],
+        "Relaciones": [
+            "Tengo problemas para comunicarme con mi pareja",
+            "¿Cómo puedo establecer límites saludables con mi familia?",
+            "Me cuesta confiar en los demás después de una mala experiencia"
+        ],
+        "Autoestima": [
+            "Siempre me comparo con los demás y me siento inferior",
+            "¿Cómo puedo mejorar mi autoimagen?",
+            "¿Qué ejercicios puedo hacer para fortalecer mi autoestima?"
+        ],
+        "Técnicas de relajación": [
+            "Me gustaría aprender técnicas para relajarme",
+            "¿Puedes guiarme en una meditación corta?",
+            "¿Qué es la relajación muscular progresiva y cómo se practica?"
+        ]
+    }
     
     # Crear interfaz con Gradio
     with gr.Blocks(title="Asistente de Salud Mental") as demo:
+        # Encabezado
         with gr.Row():
             with gr.Column(scale=3):
                 gr.Markdown(
@@ -43,6 +93,7 @@ def create_mental_health_interface():
                 if os.path.exists(logo_path):
                     gr.Image(value=logo_path, show_label=False, container=False)
         
+        # Selectores de categoría y modelo
         with gr.Row():
             with gr.Column(scale=2):
                 # Categorías de salud mental
@@ -76,7 +127,19 @@ def create_mental_health_interface():
             with gr.Column(scale=1):
                 submit_btn = gr.Button("Enviar", variant="primary")
         
-        clear_btn = gr.Button("Nueva conversación")
+        # Botones de acción
+        with gr.Row():
+            clear_btn = gr.Button("Nueva conversación")
+            example_btn = gr.Button("Mostrar ejemplos")
+        
+        # Ejemplos de preguntas (inicialmente oculto)
+        example_container = gr.Box(visible=False)
+        with example_container:
+            gr.Markdown("### Ejemplos de preguntas para esta categoría")
+            example_btns = []
+            for i in range(3):  # Mostraremos 3 ejemplos por categoría
+                btn = gr.Button("Ejemplo", visible=True)
+                example_btns.append(btn)
         
         # Área para recursos
         with gr.Accordion("Recursos", open=False):
@@ -95,12 +158,30 @@ def create_mental_health_interface():
                                   label="Longitud máxima", 
                                   step=64)
         
-        # Estado para almacenar la categoría actual
+        # Estado para almacenar datos entre interacciones
         state = gr.State({"category": "General", "history": []})
         
         # Función para procesar mensajes
-        def process_message(message, history, state_data, model, temp, tokens):
-            """Procesa el mensaje del usuario y genera una respuesta usando GroqCloud"""
+        def process_message(message: str, 
+                           history: List[Tuple[str, str]], 
+                           state_data: Dict[str, Any], 
+                           model: str, 
+                           temp: float, 
+                           tokens: int) -> Tuple[str, List[Tuple[str, str]], Dict[str, Any]]:
+            """
+            Procesa el mensaje del usuario y genera una respuesta usando GroqCloud
+            
+            Args:
+                message: Mensaje del usuario
+                history: Historial de la conversación en formato Gradio
+                state_data: Datos de estado de la conversación
+                model: ID del modelo a usar
+                temp: Temperatura para la generación
+                tokens: Cantidad máxima de tokens a generar
+                
+            Returns:
+                Tupla con (mensaje vacío, historial actualizado, estado actualizado)
+            """
             if not message.strip():
                 return "", history, state_data
             
@@ -126,10 +207,14 @@ def create_mental_health_interface():
                 # Crear cliente de GroqCloud
                 groq = GroqClient()
                 
+                # Mostrar mensaje de "escribiendo..." en la interfaz
+                yield "", history + [(message, "...")], state_data
+                
                 # Generar respuesta
                 response = groq.generate_mental_health_response(
                     message, 
                     category=category,
+                    model_id=model,
                     temperature=temp,
                     max_tokens=int(tokens)
                 )
@@ -147,8 +232,17 @@ def create_mental_health_interface():
             return "", history, state_data
         
         # Función para actualizar la categoría
-        def update_category(category, state_data):
-            """Actualiza la categoría en el estado"""
+        def update_category(category: str, state_data: Dict[str, Any]) -> Tuple[Dict[str, Any], str]:
+            """
+            Actualiza la categoría en el estado y actualiza los recursos mostrados
+            
+            Args:
+                category: Categoría seleccionada
+                state_data: Datos de estado
+                
+            Returns:
+                Tupla con (estado actualizado, recursos para mostrar)
+            """
             state_data["category"] = category
             
             # Actualizar recursos mostrados
@@ -173,8 +267,16 @@ def create_mental_health_interface():
             return state_data, resources_text
         
         # Función para actualizar la sugerencia de prompt
-        def update_prompt_suggestion(category):
-            """Devuelve una sugerencia de mensaje basada en la categoría"""
+        def update_prompt_suggestion(category: str) -> str:
+            """
+            Devuelve una sugerencia de mensaje basada en la categoría
+            
+            Args:
+                category: Categoría seleccionada
+                
+            Returns:
+                Texto de sugerencia para el campo de mensaje
+            """
             prompts = {
                 "General": "Hola, me gustaría conversar contigo.",
                 "Ansiedad": "Últimamente me siento ansioso. ¿Podrías ayudarme?",
@@ -188,29 +290,131 @@ def create_mental_health_interface():
             return prompts.get(category, f"Me gustaría hablar sobre {category.lower()}.")
         
         # Función para limpiar la conversación
-        def clear_conversation():
-            """Limpia la conversación y el estado"""
+        def clear_conversation() -> Tuple[List[Tuple[str, str]], Dict[str, Any]]:
+            """
+            Limpia la conversación y el estado
+            
+            Returns:
+                Tupla con (historial vacío, estado reiniciado)
+            """
             return [], {"category": topic.value, "history": []}
         
-        # Eventos
-        submit_btn.click(process_message, [msg, chatbot, state, model_selector, temperature, max_tokens], [msg, chatbot, state])
-        msg.submit(process_message, [msg, chatbot, state, model_selector, temperature, max_tokens], [msg, chatbot, state])
-        clear_btn.click(clear_conversation, None, [chatbot, state])
-        topic.change(update_category, [topic, state], [state, resources_md])
-        topic.change(update_prompt_suggestion, [topic], [msg])
+        # Función para alternar ejemplos
+        def toggle_examples(visible: bool) -> bool:
+            """
+            Alterna la visibilidad del contenedor de ejemplos
+            
+            Args:
+                visible: Estado actual de visibilidad
+                
+            Returns:
+                Nuevo estado de visibilidad
+            """
+            return not visible
+        
+        # Función para actualizar ejemplos
+        def update_examples(category: str) -> List[str]:
+            """
+            Actualiza los textos de los botones de ejemplo según la categoría
+            
+            Args:
+                category: Categoría seleccionada
+                
+            Returns:
+                Lista de textos para los botones de ejemplo
+            """
+            category_examples = examples.get(category, examples["General"])
+            return category_examples[:3]  # Máximo 3 ejemplos
+        
+        # Función para usar un ejemplo como mensaje
+        def use_example(example_text: str) -> str:
+            """
+            Establece el texto del ejemplo como mensaje
+            
+            Args:
+                example_text: Texto del ejemplo seleccionado
+                
+            Returns:
+                Texto para el campo de mensaje
+            """
+            return example_text
         
         # Mostrar info del modelo seleccionado
-        def show_model_info(model_id):
-            """Muestra información del modelo seleccionado"""
+        def show_model_info(model_id: str) -> str:
+            """
+            Muestra información del modelo seleccionado
+            
+            Args:
+                model_id: ID del modelo seleccionado
+                
+            Returns:
+                Información sobre el modelo como texto
+            """
             if model_id in GROQ_MODELS:
                 model_info = GROQ_MODELS[model_id]
                 return f"Modelo: {model_info['name']} | Contexto: {model_info['context_length']} tokens | {model_info['description']}"
             return ""
         
-        model_selector.change(show_model_info, [model_selector], [])
+        # Conectar eventos
+        submit_btn.click(
+            process_message, 
+            [msg, chatbot, state, model_selector, temperature, max_tokens], 
+            [msg, chatbot, state]
+        )
+        
+        msg.submit(
+            process_message, 
+            [msg, chatbot, state, model_selector, temperature, max_tokens], 
+            [msg, chatbot, state]
+        )
+        
+        clear_btn.click(
+            clear_conversation, 
+            None, 
+            [chatbot, state]
+        )
+        
+        topic.change(
+            update_category, 
+            [topic, state], 
+            [state, resources_md]
+        )
+        
+        topic.change(
+            update_prompt_suggestion, 
+            [topic], 
+            [msg]
+        )
+        
+        topic.change(
+            update_examples,
+            [topic],
+            [btn.value for btn in example_btns]
+        )
+        
+        example_btn.click(
+            toggle_examples,
+            example_container.visible,
+            example_container.visible
+        )
+        
+        # Conectar cada botón de ejemplo para establecer el mensaje
+        for btn in example_btns:
+            btn.click(
+                use_example,
+                btn,
+                msg
+            )
+        
+        model_selector.change(
+            show_model_info, 
+            [model_selector], 
+            []
+        )
         
     return demo
 
 if __name__ == "__main__":
+    # Prueba de la interfaz
     demo = create_mental_health_interface()
     demo.launch(server_name="0.0.0.0", server_port=7860)

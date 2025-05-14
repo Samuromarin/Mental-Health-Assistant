@@ -16,9 +16,16 @@ build/
 # Archivos de logs
 *.log
 
+# Archivos generados durante la ejecución
+assets/
+
 # Entornos locales
-.env
 .env.local
 
 # Otros
 .DS_Store
+.idea/
+.vscode/
+
+# Específicos de la aplicación
+*.db

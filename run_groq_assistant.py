@@ -9,7 +9,10 @@ para procesar las consultas del usuario.
 import os
 import sys
 import argparse
+import time
 from dotenv import load_dotenv
+import gradio as gr
+from PIL import Image, ImageDraw, ImageFont
 
 # Añadir el directorio raíz al path para importaciones relativas
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Asistente de Salud Mental con GroqCloud")
     parser.add_argument("--port", type=int, default=7860, help="Puerto para la interfaz web")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host para la interfaz web")
-    parser.add_argument("--share", action="store_true", help="Compartir la interfaz web")
+    parser.add_argument("--share", action="store_true", help="Compartir la interfaz web con un enlace público")
     parser.add_argument("--model", type=str, help="Modelo de GroqCloud a usar")
     parser.add_argument("--debug", action="store_true", help="Modo debug")
     return parser.parse_args()
@@ -37,49 +40,100 @@ def verify_groq_api_key():
         return False
     return True
 
+def create_default_assets():
+    """Crea archivos de assets por defecto si no existen"""
+    assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+    os.makedirs(assets_dir, exist_ok=True)
+    
+    # Crear logo si no existe
+    logo_path = os.path.join(assets_dir, "logo.png")
+    if not os.path.exists(logo_path):
+        # Intentar crear un logo minimalista con PIL
+        try:
+            # Crear imagen
+            img = Image.new('RGB', (300, 100), color=(255, 255, 255))
+            d = ImageDraw.Draw(img)
+            
+            # Dibujar texto
+            try:
+                font = ImageFont.truetype("arial.ttf", 20)
+            except IOError:
+                font = ImageFont.load_default()
+                
+            d.text((10, 40), "Asistente de Salud Mental", fill=(0, 0, 0), font=font)
+            
+            # Guardar imagen
+            img.save(logo_path)
+            
+            print(f"✅ Creado logo por defecto en {logo_path}")
+        except Exception as e:
+            print(f"⚠️ No se pudo crear el logo: {e}")
+
 def main():
     """Función principal"""
-    args = parse_args()
-    
-    # Verificar clave API
-    if not verify_groq_api_key():
-        return 1
-    
     try:
-        # Importar el cliente de GroqCloud
+        args = parse_args()
+        
+        print("🧠 Iniciando Asistente de Salud Mental basado en LLMs...")
+        
+        # Verificar que tenemos todos los requisitos
+        if not verify_groq_api_key():
+            return 1
+        
+        # Crear assets por defecto
+        create_default_assets()
+        
+        # Importar el cliente de GroqCloud y probar la conexión
         from src.utils.groq_client import GroqClient
         
-        # Probar la conexión
-        client = GroqClient()
-        models = client.get_available_models()
-        print("✅ Conexión con GroqCloud establecida")
-        print(f"📋 Modelos disponibles: {', '.join(models)}")
-        
-        # Si se especificó un modelo, verificar que exista
-        if args.model and args.model not in models:
-            print(f"⚠️  El modelo {args.model} no está disponible. Modelos disponibles: {', '.join(models)}")
-            print(f"Se usará el modelo predeterminado: {models[0]}")
-            args.model = models[0]
-        elif args.model:
-            print(f"✅ Se usará el modelo: {args.model}")
-        else:
-            print(f"✅ Se usará el modelo predeterminado: {models[0]}")
+        try:
+            client = GroqClient()
+            models = client.get_available_models()
+            print("✅ Conexión con GroqCloud establecida")
+            print(f"📋 Modelos disponibles: {', '.join(models)}")
+            
+            # Si se especificó un modelo, verificar que exista
+            if args.model and args.model not in models:
+                print(f"⚠️  El modelo {args.model} no está disponible. Modelos disponibles: {', '.join(models)}")
+                print(f"Se usará el modelo predeterminado: {models[0]}")
+                args.model = models[0]
+            elif args.model:
+                print(f"✅ Se usará el modelo: {args.model}")
+            else:
+                print(f"✅ Se usará el modelo predeterminado: {models[0]}")
+        except Exception as e:
+            print(f"⚠️ No se pudo conectar con GroqCloud: {e}")
+            print("Continuando con configuración por defecto...")
         
         # Importar la interfaz
-        from src.groq_interface import create_mental_health_interface
+        from src.interface import create_mental_health_interface
         
         # Crear la interfaz
         print("🚀 Iniciando la interfaz de usuario...")
         demo = create_mental_health_interface()
         
+        # Mostrar información de inicio
+        print("\n" + "=" * 50)
+        print("✨ ¡Asistente iniciado correctamente!")
+        print(f"💬 Interfaz web disponible en http://localhost:{args.port}")
+        if args.share:
+            print("🌐 La interfaz también estará disponible con un enlace público")
+        print("💡 Presiona Ctrl+C para detener el asistente")
+        print("=" * 50 + "\n")
+        
         # Iniciar la interfaz
+        demo.queue(concurrency_count=5)  # Permitir varias solicitudes simultáneas
         demo.launch(
             server_name=args.host,
             server_port=args.port,
             share=args.share,
-            debug=args.debug
+            debug=args.debug,
+            show_error=args.debug
         )
         
+        return 0
+    except KeyboardInterrupt:
+        print("\n👋 Deteniendo el asistente...")
         return 0
     except Exception as e:
         print(f"❌ Error al iniciar el asistente: {e}")

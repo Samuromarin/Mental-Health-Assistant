@@ -4,14 +4,12 @@ from dotenv import load_dotenv
 # Cargar variables de entorno
 load_dotenv()
 
-# Configuración de APIs
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")  # Añadida clave de GroqCloud
+# Configuración de la API
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
 # Configuración del modelo
 DEFAULT_MODEL = "llama2-70b-4096"  # Modelo predeterminado en Groq
-GROQ_API_BASE = "https://api.groq.com/openai/v1"  # Endpoint de Groq compatible con OpenAI
 TEMPERATURE = 0.7
 MAX_TOKENS = 500
 
@@ -39,44 +37,6 @@ EMERGENCY_NUMBERS = {
     "gender_violence": "016"
 }
 
-# Configuración de FastChat (mantenemos para compatibilidad aunque usaremos GroqCloud)
-FASTCHAT_CONFIG = {
-    "controller": {
-        "host": "localhost",
-        "port": 21001
-    },
-    "model_worker": {
-        "host": "localhost",
-        "port": 21002,
-        "model_path": os.getenv("MODEL_PATH", "facebook/opt-350m"),  # Modelo pequeño local
-        "device": os.getenv("DEVICE", "cpu"),
-        "worker_id": "mental_health_assistant_worker",
-        "model_names": ["opt", "mental_health_assistant"],
-        "load_8bit": os.getenv("LOAD_8BIT", "False").lower() == "true",
-        "cpu_offloading": os.getenv("CPU_OFFLOADING", "False").lower() == "true",
-        "gpus": os.getenv("GPUS", ""),
-        "num_gpus": int(os.getenv("NUM_GPUS", "1")),
-        "max_gpu_memory": os.getenv("MAX_GPU_MEMORY", None),
-    },
-    "api_server": {
-        "host": "localhost",
-        "port": 8000
-    },
-    "web_server": {
-        "host": "0.0.0.0",
-        "port": 7860,
-        "share": os.getenv("SHARE_GRADIO", "False").lower() == "true"
-    }
-}
-
-# Configuración específica de generación para Vicuna
-VICUNA_GENERATION_CONFIG = {
-    "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-    "top_p": float(os.getenv("TOP_P", "0.9")),
-    "max_new_tokens": int(os.getenv("MAX_NEW_TOKENS", "512")), 
-    "repetition_penalty": float(os.getenv("REPETITION_PENALTY", "1.1")),
-}
-
 # Configuración de modelos disponibles en GroqCloud
 GROQ_MODELS = {
     "llama2-70b-4096": {
@@ -95,15 +55,6 @@ GROQ_MODELS = {
         "description": "Modelo eficiente con buena relación rendimiento/tamaño"
     }
 }
-
-# Template de prompt optimizado para salud mental
-MENTAL_HEALTH_PROMPT_TEMPLATE = """
-Eres un asistente virtual especializado en salud mental. Proporcionas apoyo emocional, escucha empática y recursos psicoeducativos. No proporcionas diagnósticos clínicos ni reemplazas a profesionales de la salud mental. Ofreces respuestas que promueven el bienestar psicológico.
-
-Para situaciones de crisis, recomiendas buscar ayuda profesional inmediata. Tu enfoque es personalizado, empático y basado en evidencia científica. Usas un lenguaje accesible y respetuoso.
-
-Consulta del usuario: {message}
-"""
 
 # Configuración de categorías de salud mental
 MENTAL_HEALTH_CATEGORIES = [
@@ -155,7 +106,7 @@ RESOURCES = {
     ]
 }
 
-# Configuración para plantillas de mensajes de sistema según categoría
+# Mensajes de sistema según categoría
 SYSTEM_MESSAGES = {
     "General": """Eres un asistente de salud mental empático y respetuoso. Proporcionas información general 
     sobre salud mental, apoyo emocional y recursos psicoeducativos. No diagnosticas ni reemplazas 
