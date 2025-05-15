@@ -9,9 +9,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
 # Configuración del modelo
-DEFAULT_MODEL = "llama2-70b-4096"  # Modelo predeterminado en Groq
-TEMPERATURE = 0.7
-MAX_TOKENS = 500
+# Modelos disponibles confirmados por check_groq_models.py
+DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # Modelo que funcionó en la prueba
 
 # Rutas de archivos
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,21 +37,33 @@ EMERGENCY_NUMBERS = {
 }
 
 # Configuración de modelos disponibles en GroqCloud
+# Actualizado según los resultados de check_groq_models.py
+# Seleccionando modelos adecuados para texto conversacional
 GROQ_MODELS = {
-    "llama2-70b-4096": {
-        "name": "Llama-2-70b-chat",
-        "context_length": 4096,
-        "description": "Modelo grande con excelente rendimiento general"
+    "meta-llama/llama-4-scout-17b-16e-instruct": {
+        "name": "Llama 4 Scout 17B",
+        "context_length": 128000,
+        "description": "Modelo Scout de Meta Llama 4, optimizado para instrucciones"
     },
-    "mixtral-8x7b-32768": {
-        "name": "Mixtral-8x7b",
-        "context_length": 32768,
-        "description": "Modelo con contexto muy largo"
-    },
-    "gemma-7b-it": {
-        "name": "Gemma-7b-it",
+    "llama3-70b-8192": {
+        "name": "Llama 3 70B",
         "context_length": 8192,
-        "description": "Modelo eficiente con buena relación rendimiento/tamaño"
+        "description": "Modelo grande de Llama 3 con amplio contexto"
+    },
+    "compound-beta": {
+        "name": "Compound Beta",
+        "context_length": 128000,
+        "description": "Modelo de Groq optimizado para rendimiento"
+    },
+    "gemma2-9b-it": {
+        "name": "Gemma 2 9B IT",
+        "context_length": 8192,
+        "description": "Modelo de Google optimizado para instrucciones"
+    },
+    "llama-3.3-70b-versatile": {
+        "name": "Llama 3.3 70B Versatile",
+        "context_length": 8192,
+        "description": "Versión versátil del modelo Llama 3.3"
     }
 }
 
@@ -138,3 +149,10 @@ SYSTEM_MESSAGES = {
     y otras técnicas de reducción de estrés. Adaptas las técnicas a las necesidades y preferencias 
     del usuario."""
 }
+
+# Definir la plantilla para Vicuna si es necesaria
+VICUNA_PROMPT_TEMPLATE = """A continuación hay una conversación entre un usuario y un asistente especializado en salud mental.
+El asistente es empático, respetuoso, y proporciona información útil basada en evidencia científica, aunque no reemplaza a un profesional de salud mental.
+
+Usuario: {message}
+Asistente:"""

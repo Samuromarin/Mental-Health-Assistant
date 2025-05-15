@@ -6,6 +6,8 @@ import os
 import sys
 import gradio as gr
 from typing import Dict, Any, List, Tuple, Union
+import traceback
+import time
 
 # Añadir el directorio raíz al path para importaciones relativas
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,9 +28,10 @@ def create_mental_health_interface():
     try:
         client = GroqClient()
         available_models = client.get_available_models()
+        print(f"✅ Modelos disponibles: {available_models}")
     except Exception as e:
-        print(f"Error al inicializar el cliente de GroqCloud: {e}")
-        available_models = list(GROQ_MODELS.keys()) if GROQ_MODELS else ["llama2-70b-4096"]
+        print(f"⚠️ Error al inicializar el cliente de GroqCloud: {e}")
+        available_models = list(GROQ_MODELS.keys()) if GROQ_MODELS else ["meta-llama/llama-4-scout-17b-16e-instruct"]
     
     # Ejemplos de preguntas por categoría para mejorar la experiencia de usuario
     examples = {
@@ -113,6 +116,9 @@ def create_mental_health_interface():
                     value=available_models[0] if available_models else None
                 )
         
+        # Status para mostrar errores o información
+        status_box = gr.Textbox(label="Estado", visible=False)
+        
         # Interfaz de chat
         chatbot = gr.Chatbot(height=500, show_label=False)
         
@@ -133,7 +139,7 @@ def create_mental_health_interface():
             example_btn = gr.Button("Mostrar ejemplos")
         
         # Ejemplos de preguntas (en un Accordion para evitar problemas con Box)
-        with gr.Accordion("Ejemplos de preguntas", open=False) as example_container:
+        with gr.Accordion("Ejemplos de preguntas", open=False, visible=False) as example_container:
             gr.Markdown("### Ejemplos de preguntas para esta categoría")
             
             # Botones de ejemplo todos en la misma fila
@@ -143,7 +149,7 @@ def create_mental_health_interface():
                     btn = gr.Button("Ejemplo", visible=True)
                     example_btns.append(btn)
         
-        # Variable para controlar visibilidad (evitamos usar directly .visible)
+        # Variable para controlar visibilidad
         show_examples = gr.Checkbox(label="Mostrar ejemplos", value=False, visible=False)
         
         # Área para recursos
@@ -162,17 +168,20 @@ def create_mental_health_interface():
             max_tokens = gr.Slider(64, 4096, 512, 
                                   label="Longitud máxima", 
                                   step=64)
+            timeout = gr.Slider(5, 120, 60,
+                              label="Tiempo máximo de espera (segundos)",
+                              info="Tiempo máximo para esperar una respuesta")
         
         # Estado para almacenar datos entre interacciones
         state = gr.State({"category": "General", "history": []})
         
-        # Función para procesar mensajes
-        def process_message(message, history, state_data, model, temp, tokens):
+        # Función para procesar mensajes (versión no async para mayor compatibilidad)
+        def process_message(message, history, state_data, model, temp, tokens, max_timeout):
             """
             Procesa el mensaje del usuario y genera una respuesta usando GroqCloud
             """
             if not message.strip():
-                return "", history, state_data
+                return "", history, state_data, gr.update(visible=False, value="")
             
             # Actualizar historial en el estado
             if "history" not in state_data:
@@ -187,7 +196,7 @@ def create_mental_health_interface():
                 crisis_response = get_crisis_response(keywords)
                 history.append((message, crisis_response))
                 state_data["history"].append({"role": "assistant", "content": crisis_response})
-                return "", history, state_data
+                return "", history, state_data, gr.update(visible=False, value="")
             
             # Obtener categoría
             category = state_data.get("category", "General")
@@ -196,34 +205,47 @@ def create_mental_health_interface():
                 # Crear cliente de GroqCloud
                 groq = GroqClient()
                 
-                # Añadir mensaje de espera
+                # Añadir mensaje temporal de "Pensando..."
                 history.append((message, "Pensando..."))
-                yield "", history, state_data
                 
-                # Generar respuesta
-                response = groq.generate_mental_health_response(
-                    message, 
-                    category=category,
-                    model_id=model,
-                    temperature=temp,
-                    max_tokens=int(tokens)
-                )
+                # Iniciar temporizador para timeout
+                start_time = time.time()
                 
-                # Reemplazar el mensaje de espera con la respuesta real
-                history[-1] = (message, response)
-                state_data["history"].append({"role": "assistant", "content": response})
+                # Generar respuesta con timeout
+                try:
+                    response = groq.generate_mental_health_response(
+                        message, 
+                        category=category,
+                        model_id=model,
+                        temperature=temp,
+                        max_tokens=int(tokens)
+                    )
+                    
+                    # Reemplazar el mensaje de espera con la respuesta real
+                    history[-1] = (message, response)
+                    state_data["history"].append({"role": "assistant", "content": response})
+                    
+                    return "", history, state_data, gr.update(visible=False, value="")
+                    
+                except Exception as e:
+                    print(f"❌ Error al generar respuesta: {e}")
+                    print(traceback.format_exc())
+                    
+                    # Reemplazar el mensaje de espera con mensaje de error
+                    error_message = "Lo siento, ha ocurrido un error al procesar tu solicitud. Por favor, inténtalo de nuevo."
+                    history[-1] = (message, error_message)
+                    
+                    return "", history, state_data, gr.update(visible=True, value=f"Error: {str(e)}")
                 
             except Exception as e:
-                print(f"Error al generar respuesta: {e}")
-                response = "Lo siento, estoy teniendo problemas para responder en este momento. Por favor, inténtalo de nuevo."
-                # Reemplazar el mensaje de espera con el mensaje de error
-                if len(history) > 0 and history[-1][0] == message:
-                    history[-1] = (message, response)
-                else:
-                    history.append((message, response))
-                state_data["history"].append({"role": "assistant", "content": response})
-            
-            return "", history, state_data
+                print(f"❌ Error al crear cliente o procesar mensaje: {e}")
+                print(traceback.format_exc())
+                
+                # Añadir mensaje de error al chat
+                error_message = "Lo siento, ha ocurrido un error al procesar tu solicitud. Por favor, inténtalo de nuevo."
+                history.append((message, error_message))
+                
+                return "", history, state_data, gr.update(visible=True, value=f"Error: {str(e)}")
         
         # Función para actualizar la categoría
         def update_category(category, state_data):
@@ -269,26 +291,16 @@ def create_mental_health_interface():
         # Función para limpiar la conversación
         def clear_conversation():
             """Limpia la conversación y el estado"""
-            return [], {"category": topic.value, "history": []}
+            return [], {"category": topic.value, "history": []}, gr.update(visible=False, value="")
         
-        # Función para alternar ejemplos (cambiamos la implementación)
+        # Función para alternar ejemplos
         def toggle_examples(value):
-            """
-            Alterna la visibilidad del contenedor de ejemplos
-            
-            Args:
-                value: Valor actual del checkbox (ignorado)
-                
-            Returns:
-                Nuevo valor para el checkbox y configuración para el accordion
-            """
-            return not show_examples.value, gr.Accordion.update(visible=not show_examples.value)
+            """Alterna la visibilidad del contenedor de ejemplos"""
+            return not show_examples.value, gr.update(visible=not show_examples.value)
         
         # Función para actualizar ejemplos
         def update_examples(category):
-            """
-            Actualiza los textos de los botones de ejemplo según la categoría
-            """
+            """Actualiza los textos de los botones de ejemplo según la categoría"""
             category_examples = examples.get(category, examples["General"])
             # Asegurar que hay suficientes ejemplos
             while len(category_examples) < 3:
@@ -304,20 +316,20 @@ def create_mental_health_interface():
         # Conectar eventos
         submit_btn.click(
             process_message, 
-            [msg, chatbot, state, model_selector, temperature, max_tokens], 
-            [msg, chatbot, state]
+            [msg, chatbot, state, model_selector, temperature, max_tokens, timeout], 
+            [msg, chatbot, state, status_box]
         )
         
         msg.submit(
             process_message, 
-            [msg, chatbot, state, model_selector, temperature, max_tokens], 
-            [msg, chatbot, state]
+            [msg, chatbot, state, model_selector, temperature, max_tokens, timeout], 
+            [msg, chatbot, state, status_box]
         )
         
         clear_btn.click(
             clear_conversation, 
             None, 
-            [chatbot, state]
+            [chatbot, state, status_box]
         )
         
         topic.change(
