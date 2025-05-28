@@ -1,3 +1,9 @@
+"""
+-Formatea mensajes para diferentes modelos de LLM, 
+-Proporciona instrucciones específicas para cada categoría de salud mental
+-Define ejemplos de prompts por categoría
+"""
+
 from src.config.settings import VICUNA_PROMPT_TEMPLATE, MENTAL_HEALTH_CATEGORIES
 
 def format_prompt_for_vicuna(message, category="General"):

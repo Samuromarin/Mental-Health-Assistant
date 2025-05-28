@@ -4,8 +4,8 @@ setup(
     name="mental-health-assistant",
     version="0.1.0",
     description="Asistente de salud mental basado en LLMs con API de GroqCloud",
-    author="Tu nombre",
-    author_email="tu@email.com",
+    author="Samuel",
+    author_email="samuromarin@gmail.com",
     packages=find_packages(),
     install_requires=[
         "python-dotenv>=1.0.0",

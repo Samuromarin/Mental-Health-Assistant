@@ -8,6 +8,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
+
 # Configuración del modelo
 # Modelos disponibles confirmados por check_groq_models.py
 DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # Modelo que funcionó en la prueba
@@ -28,7 +29,7 @@ CRISIS_KEYWORDS = [
     "no puedo más", "ya no aguanto"
 ]
 
-# Números de emergencia (ejemplo para España)
+# Números de emergencia (España)
 EMERGENCY_NUMBERS = {
     "general": "112",
     "suicide_prevention": "024",
