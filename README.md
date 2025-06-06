@@ -21,7 +21,7 @@ Este proyecto implementa un asistente virtual de salud mental basado en Grandes 
 1. Clona este repositorio:
 
 ```bash
-git clone https://github.com/tuusuario/mental-health-assistant.git
+git clone https://github.com/Samuromarin/Mental-Health-Assistant.git
 cd mental-health-assistant
 ```
 
