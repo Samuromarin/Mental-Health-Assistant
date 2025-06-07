@@ -20,15 +20,12 @@ from src.utils.safety import detect_crisis, get_crisis_response
 custom_css = """
 /* Variables CSS para tonos naranja suaves */
 :root {
-    --primary-orange: #FF8C42;
-    --light-orange: #FFB366;
-    --very-light-orange: #FFF4E6;
-    --orange-hover: #FF7A2B;
-    --orange-accent: #FFE5CC;
-    --warm-white: #FFFBF7;
-    --soft-gray: #F8F6F3;
-    --text-dark: #5D4E37;
-    --border-light: #F0E6D2;
+    --primary-orange: #FF6B1A;      
+    --light-orange: #FF8F39;        
+    --very-light-orange: #FFEDE0;   
+    --orange-hover: #E55A00;        
+    --orange-accent: #FFD4A3;       
+    --warm-white: #FFF8F3;          
 }
 
 /* Estilo general del contenedor */
