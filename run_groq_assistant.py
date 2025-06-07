@@ -81,7 +81,7 @@ def main():
     try:
         args = parse_args()
         
-        print("🧠 Iniciando Asistente de Salud Mental basado en LLMs...")
+        print("🧠 Iniciando Asistente de Salud Mental...")
         
         # Verificar que tenemos todos los requisitos
         if not verify_groq_api_key():
