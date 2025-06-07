@@ -20,7 +20,7 @@ from src.utils.safety import detect_crisis, get_crisis_response
 custom_css = """
 /* Variables CSS para tonos naranja suaves */
 :root {
-    --primary-orange: #FF6B1A;      
+    --primary-orange: #ff7b42;      
     --light-orange: #FF8F39;        
     --very-light-orange: #FFEDE0;   
     --orange-hover: #E55A00;        
@@ -316,10 +316,11 @@ def create_mental_health_interface():
                     box-shadow: 0 2px 8px rgba(255, 140, 66, 0.1);">
             <p style="margin: 0; color: #5D4E37; font-weight: 500;">
                 ⚠️ <strong>Importante:</strong> Este asistente proporciona apoyo emocional y psicoeducación, 
-                pero no reemplaza la atención profesional. Si experimentas una crisis, contacta inmediatamente:
+                pero no reemplaza la atención profesional. 
+                Si experimentas una crisis, contacta inmediatamente:
             </p>
             <ul style="margin: 8px 0 0 20px; color: #5D4E37;">
-                <li><strong>Emergencias:</strong> 112</li>
+                <li><strong>Emergencias:</strong> 112 </li>
                 <li><strong>Línea de Prevención del Suicidio:</strong> 024</li>
             </ul>
         </div>
@@ -354,7 +355,7 @@ def create_mental_health_interface():
                 height=500, 
                 show_label=False,
                 elem_classes="chat-container",
-                avatar_images=("🧑‍💻", "🧠")
+                avatar_images=(None,None)
             )
         
         # Input y botón de envío
