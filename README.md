@@ -1,146 +1,184 @@
-# Asistente de Salud Mental con GroqCloud
+# 🧠 Asistente de Salud Mental con GroqCloud
 
-Este proyecto implementa un asistente virtual de salud mental basado en Grandes Modelos de Lenguaje (LLMs) utilizando la API de GroqCloud. Proporciona apoyo emocional y recursos psicoeducativos a través de una interfaz de chat accesible.
+Asistente virtual inteligente que combina LLMs de GroqCloud con sistema RAG (FAISS) para proporcionar apoyo emocional especializado y recursos psicoeducativos.
 
-## Características
+## ✨ Características
 
-- **Interfaz web intuitiva** basada en Gradio
-- **Categorías especializadas** para diferentes temas de salud mental
-- **Detección de crisis** para identificar mensajes que requieren derivación a servicios profesionales
-- **Respuestas personalizadas** según la categoría seleccionada
-- **Recursos útiles** para cada categoría de salud mental
-- **Acceso a múltiples modelos** a través de GroqCloud
+- **🤖 Interfaz web intuitiva** con Gradio
+- **📚 Sistema RAG avanzado** con FAISS para respuestas enriquecidas
+- **🎯 7 categorías especializadas** de salud mental
+- **🚨 Detección automática de crisis** con protocolos de seguridad
+- **⚡ Múltiples modelos LLM** de GroqCloud
+- **🛠️ Scripts de gestión completos**
 
-## Requisitos previos
-
-- Python 3.8 o superior
-- Una clave API de GroqCloud (regístrate en [console.groq.com](https://console.groq.com))
-
-## Instalación
-
-1. Clona este repositorio:
+## 🚀 Instalación
 
 ```bash
+# 1. Clonar repositorio
 git clone https://github.com/Samuromarin/Mental-Health-Assistant.git
 cd mental-health-assistant
-```
 
-2. Instala las dependencias:
+# 2. Crear entorno virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
 
-```bash
+# 3. Instalar dependencias
 pip install -r requirements.txt
-```
 
-3. Crea un archivo `.env` en la raíz del proyecto con tu clave API:
+# 4. Configurar API (crear archivo .env)
+echo "GROQ_API_KEY=tu_clave_api_aquí" > .env
 
-```
-GROQ_API_KEY=tu_clave_api_aquí
-```
+# 5. Configurar RAG (opcional)
+python manage_rag.py create-examples
+python manage_rag.py index
 
-## Uso
-
-### Iniciar el asistente web
-
-Para iniciar el asistente con la interfaz web:
-
-```bash
+# 6. Iniciar asistente
 python run_groq_assistant.py
 ```
 
-Opciones disponibles:
-- `--port PUERTO`: Especifica el puerto para la interfaz web (por defecto: 7860)
-- `--host HOST`: Especifica el host (por defecto: 0.0.0.0)
-- `--share`: Comparte la interfaz con un enlace público temporal
-- `--model MODELO`: Usa un modelo específico de GroqCloud
-- `--debug`: Activa el modo de depuración
+¡Listo! Accede en: http://localhost:7860
 
-### Probar la API directamente
+## 🎯 Categorías de Salud Mental
 
-Para probar rápidamente si tu configuración funciona correctamente:
+| Categoría | Enfoque |
+|-----------|---------|
+| 🌟 **General** | Bienestar emocional general |
+| 😰 **Ansiedad** | Técnicas de respiración, manejo de crisis |
+| 😔 **Depresión** | Apoyo emocional, estrategias de afrontamiento |
+| ⚡ **Estrés** | Técnicas de relajación, mindfulness |
+| 💕 **Relaciones** | Comunicación, límites saludables |
+| 💪 **Autoestima** | Fortalecimiento personal, autocompasión |
+| 🧘 **Relajación** | Mindfulness, respiración, meditación |
 
-```bash
-python test_groq_api.py --message "¿Cómo puedo manejar el estrés?"
-```
-
-O para modo interactivo:
-
-```bash
-python test_groq_api.py --interactive
-```
-
-Opciones disponibles:
-- `--message MENSAJE`, `-m MENSAJE`: Mensaje a enviar
-- `--category CATEGORÍA`, `-c CATEGORÍA`: Categoría de salud mental
-- `--model MODELO`: Modelo específico de GroqCloud
-- `--list-models`, `-l`: Listar modelos disponibles
-- `--interactive`, `-i`: Modo interactivo para múltiples consultas
-- `--temperature TEMP`, `-t TEMP`: Temperatura para la generación (0.1-1.5)
-- `--max-tokens TOKENS`, `-mt TOKENS`: Número máximo de tokens en la respuesta
-
-## Estructura del proyecto
+## 🏗️ Estructura del Proyecto
 
 ```
 mental-health-assistant/
-│
-├── run_groq_assistant.py     # Script principal para iniciar el asistente
-├── test_groq_api.py          # Script para probar la API directamente
-├── requirements.txt          # Dependencias
-├── setup.py                  # Configuración de instalación
-│
-├── assets/                   # Recursos estáticos (logo, etc.)
+├── 🚀 run_groq_assistant.py     # Script principal
+├── 🧪 test_groq_api.py          # Pruebas API
+├── ✅ check_groq_models.py      # Verificar modelos
+├── 🔧 manage_rag.py             # Gestión RAG
+├── 📋 requirements.txt          # Dependencias
 │
 └── src/
-    ├── config/
-    │   ├── settings.py       # Configuraciones centralizadas
-    │
-    ├── interface.py          # Interfaz Gradio
-    │
+    ├── config/settings.py       # ⚙️ Configuraciones
+    ├── interface.py             # 🖥️ Interfaz Gradio
     └── utils/
-        ├── groq_client.py    # Cliente para GroqCloud
-        └── safety.py         # Detección de crisis y seguridad
+        ├── groq_client.py       # 🤖 Cliente GroqCloud
+        ├── rag_manager.py       # 📚 Sistema RAG
+        ├── safety.py            # 🚨 Detección crisis
+        └── prompts.py           # 💬 Formateo prompts
 ```
 
-## Categorías de salud mental
+## 🛠️ Scripts Disponibles
 
-El asistente proporciona apoyo en las siguientes categorías:
+| Script | Uso | Ejemplo |
+|--------|-----|---------|
+| `run_groq_assistant.py` | Interfaz web principal | `python run_groq_assistant.py --share` |
+| `test_groq_api.py` | Pruebas rápidas de API | `python test_groq_api.py -i` |
+| `check_groq_models.py` | Verificar modelos | `python check_groq_models.py` |
+| `manage_rag.py` | Gestión documentos RAG | `python manage_rag.py status` |
 
-1. **General**: Información general sobre salud mental y bienestar emocional
-2. **Ansiedad**: Apoyo para comprender y manejar la ansiedad
-3. **Depresión**: Información sobre síntomas depresivos y estrategias de afrontamiento
-4. **Estrés**: Técnicas para manejar el estrés cotidiano
-5. **Relaciones**: Apoyo para mejorar la comunicación y establecer límites saludables
-6. **Autoestima**: Estrategias para desarrollar una autoimagen positiva
-7. **Técnicas de relajación**: Guías paso a paso para técnicas de relajación y mindfulness
+### Ejemplos de uso:
 
-## Consideraciones éticas
+```bash
+# Interfaz web con puerto personalizado
+python run_groq_assistant.py --port 8080 --share
 
-Este asistente está diseñado como una herramienta de apoyo y psicoeducación, y **no reemplaza a profesionales de salud mental**. Se debe utilizar como complemento, no como sustituto, de la atención profesional.
+# Prueba rápida de API
+python test_groq_api.py -m "¿Cómo manejar la ansiedad?" -c Ansiedad
 
-Características de seguridad implementadas:
-- Detección de mensajes que indican riesgo de crisis
-- Protocolos de derivación a servicios de emergencia
-- Recordatorios claros sobre las limitaciones del asistente
+# Modo interactivo
+python test_groq_api.py --interactive
 
-## Personalización
 
-Puedes personalizar varios aspectos del asistente editando el archivo `src/config/settings.py`:
 
-- **Modelos disponibles**: Añade o modifica los modelos de GroqCloud
-- **Categorías**: Personaliza o añade categorías de salud mental
-- **Recursos**: Actualiza los enlaces a recursos útiles
-- **Mensajes del sistema**: Modifica las instrucciones para cada categoría
-- **Palabras clave de crisis**: Personaliza la detección de mensajes de crisis
+## 📚 Sistema RAG
 
-## Limitaciones
+### Configuración inicial:
+```bash
+python manage_rag.py create-examples  # Crear documentos ejemplo
+python manage_rag.py index            # Indexar documentos
+python manage_rag.py status           # Ver estado
+python manage_rag.py search "técnicas de respiración"  # Buscar en base de conocimientos
+```
 
-- El asistente no proporciona diagnósticos clínicos
-- Las respuestas dependen de la calidad de los modelos de GroqCloud
-- No sustituye la atención profesional de salud mental
+### Gestión de documentos:
+```bash
+python manage_rag.py search "ansiedad" --category Ansiedad
+python manage_rag.py add "Nuevo contenido" --title "Mi documento"
+python manage_rag.py list-docs
+```
 
-## Licencia
+## ⚙️ Configuración
 
-Este proyecto está licenciado bajo [MIT License](LICENSE).
+### Variables de entorno (.env):
+```env
+GROQ_API_KEY=tu_clave_api_aquí
+RAG_ENABLED=true
+RAG_CHUNK_SIZE=1000
+RAG_SEARCH_K=3
+```
+
+### Modelos disponibles:
+- `meta-llama/llama-4-scout-17b-16e-instruct` (recomendado)
+- `llama3-70b-8192`
+- `compound-beta`
+- `gemma2-9b-it`
+- `llama-3.3-70b-versatile`
+
+## 🛡️ Seguridad
+
+### Detección automática de crisis:
+- **Palabras clave de riesgo** suicida/autolesión
+- **Derivación inmediata** a servicios profesionales
+- **Protocolos de emergencia** integrados
+
+### Números de emergencia (España):
+- **🚨 Emergencias**: 112
+- **💙 Prevención Suicidio**: 024
+- **🆘 Salud Mental**: 900 10 22 10
+- **👥 Violencia de Género**: 016
+
+## 🐛 Resolución de Problemas
+
+```bash
+# Verificar conexión GroqCloud
+python check_groq_models.py
+
+# Verificar estado RAG
+python manage_rag.py status
+
+# Reindexar documentos
+python manage_rag.py clean
+python manage_rag.py create-examples
+python manage_rag.py index
+
+# Probar API básica
+python test_groq_api.py -m "Hola" --list-models
+```
+
+### Errores comunes:
+- **FAISS no disponible**: `pip install faiss-cpu`
+- **Clave API inválida**: Verificar `.env`
+- **RAG no funciona**: Ejecutar `python manage_rag.py index`
+
+
+## 📜 Licencia
+
+MIT License - Ver `LICENSE`
+
+## ⚠️ Disclaimer Importante
+
+**Este asistente NO reemplaza atención profesional de salud mental.**
+
+En caso de emergencia, contacta inmediatamente:
+- **🚨 España**: 112 (Emergencias), 024 (Prevención Suicidio)
+- **🌍 Internacional**: Servicios de emergencia locales
 
 ---
 
-**Nota**: Este asistente es una herramienta educativa y de apoyo. Si experimentas una crisis de salud mental, busca ayuda profesional inmediatamente a través de servicios de emergencia locales o líneas de crisis.
+**Desarrollado con ❤️ para apoyar el bienestar mental de la comunidad**
+
+*¿Dudas? [Abre un issue](https://github.com/Samuromarin/Mental-Health-Assistant/issues)*
