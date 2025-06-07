@@ -1,4 +1,4 @@
-# 🧠 Asistente de Salud Mental con GroqCloud
+# 🧠 Asistente de Salud Mental
 
 Asistente virtual inteligente que combina LLMs de GroqCloud con sistema RAG (FAISS) para proporcionar apoyo emocional especializado y recursos psicoeducativos.
 
