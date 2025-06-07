@@ -8,9 +8,8 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
-# Configuración del modelo
-# Modelos disponibles confirmados por check_groq_models.py
-DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # Modelo que funcionó en la prueba
+# Configuración del modelo - ACTUALIZADO con tus modelos disponibles
+DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # Modelo más reciente
 
 # Configuración RAG con FAISS
 RAG_ENABLED = os.getenv("RAG_ENABLED", "true").lower() == "true"
@@ -49,34 +48,53 @@ EMERGENCY_NUMBERS = {
     "gender_violence": "016"
 }
 
-# Configuración de modelos disponibles en GroqCloud
-# Actualizado según los resultados de check_groq_models.py
-# Seleccionando modelos adecuados para texto conversacional
+# Configuración de modelos disponibles en tu cuenta GroqCloud
+# Solo modelos de chat/texto (sin Whisper ni TTS)
 GROQ_MODELS = {
     "meta-llama/llama-4-scout-17b-16e-instruct": {
         "name": "Llama 4 Scout 17B",
         "context_length": 128000,
-        "description": "Modelo Scout de Meta Llama 4, optimizado para instrucciones"
+        "description": "Modelo más reciente de Meta Llama 4, optimizado para instrucciones"
+    },
+    "meta-llama/llama-4-maverick-17b-128e-instruct": {
+        "name": "Llama 4 Maverick 17B",
+        "context_length": 128000,
+        "description": "Modelo Maverick de Meta Llama 4 con contexto extendido"
     },
     "llama3-70b-8192": {
         "name": "Llama 3 70B",
         "context_length": 8192,
-        "description": "Modelo grande de Llama 3 con amplio contexto"
+        "description": "Modelo grande de Llama 3 con excelente rendimiento"
+    },
+    "llama-3.3-70b-versatile": {
+        "name": "Llama 3.3 70B Versatile",
+        "context_length": 8192,
+        "description": "Versión versátil del modelo Llama 3.3"
     },
     "compound-beta": {
         "name": "Compound Beta",
         "context_length": 128000,
-        "description": "Modelo de Groq optimizado para rendimiento"
+        "description": "Modelo experimental de Groq con alto rendimiento"
     },
     "gemma2-9b-it": {
         "name": "Gemma 2 9B IT",
         "context_length": 8192,
         "description": "Modelo de Google optimizado para instrucciones"
     },
-    "llama-3.3-70b-versatile": {
-        "name": "Llama 3.3 70B Versatile",
+    "deepseek-r1-distill-llama-70b": {
+        "name": "DeepSeek R1 Distill 70B",
         "context_length": 8192,
-        "description": "Versión versátil del modelo Llama 3.3"
+        "description": "Modelo destilado de DeepSeek con base Llama"
+    },
+    "llama-3.1-8b-instant": {
+        "name": "Llama 3.1 8B Instant",
+        "context_length": 8192,
+        "description": "Modelo rápido de Llama 3.1 para respuestas instantáneas"
+    },
+    "llama3-8b-8192": {
+        "name": "Llama 3 8B",
+        "context_length": 8192,
+        "description": "Modelo base de Llama 3, rápido y eficiente"
     }
 }
 

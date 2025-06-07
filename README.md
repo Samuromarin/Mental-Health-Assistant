@@ -13,31 +13,59 @@ Asistente virtual inteligente que combina LLMs de GroqCloud con sistema RAG (FAI
 
 ## 🚀 Instalación
 
+### 1. Clonar repositorio
 ```bash
-# 1. Clonar repositorio
 git clone https://github.com/Samuromarin/Mental-Health-Assistant.git
-cd mental-health-assistant
+cd Mental-Health-Assistant
+```
 
-# 2. Crear entorno virtual
+### 2. Crear entorno virtual
+```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
 
-# 3. Instalar dependencias
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
+```
+
+### 3. Instalar dependencias
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Configurar API (crear archivo .env)
-echo "GROQ_API_KEY=tu_clave_api_aquí" > .env
+### 4. Configurar API de GroqCloud
+1. Ve a [console.groq.com](https://console.groq.com/) y obtén tu clave API gratuita
+2. Crea un archivo `.env` en la raíz del proyecto con tu clave:
+```
+GROQ_API_KEY=tu_clave_api_aquí
+```
 
-# 5. Configurar RAG (opcional)
+### 5. Verificar configuración
+```bash
+# Verificar que la API funciona
+python check_groq_models.py
+```
+
+### 6. Configurar RAG (opcional pero recomendado)
+```bash
+# Crear documentos de ejemplo
 python manage_rag.py create-examples
+
+# Indexar documentos en FAISS
 python manage_rag.py index
 
-# 6. Iniciar asistente
+# Verificar estado
+python manage_rag.py status
+```
+
+### 7. Iniciar asistente
+```bash
 python run_groq_assistant.py
 ```
 
-¡Listo! Accede en: http://localhost:7860
+¡Listo! Accede en: **http://localhost:7860**
 
 ## 🎯 Categorías de Salud Mental
 
@@ -91,8 +119,7 @@ python test_groq_api.py -m "¿Cómo manejar la ansiedad?" -c Ansiedad
 
 # Modo interactivo
 python test_groq_api.py --interactive
-
-
+```
 
 ## 📚 Sistema RAG
 
@@ -115,7 +142,7 @@ python manage_rag.py list-docs
 
 ### Variables de entorno (.env):
 ```env
-GROQ_API_KEY=tu_clave_api_aquí
+GROQ_API_KEY=gsk_tu_clave_api_aquí
 RAG_ENABLED=true
 RAG_CHUNK_SIZE=1000
 RAG_SEARCH_K=3
@@ -143,6 +170,18 @@ RAG_SEARCH_K=3
 
 ## 🐛 Resolución de Problemas
 
+### Problemas comunes y soluciones:
+
+#### Error de codificación en .env
+```bash
+# Si ves errores de UTF-8, elimina y recrea el archivo .env
+del .env  # Windows
+rm .env   # Linux/Mac
+
+# Luego créalo manualmente con editor de texto (UTF-8)
+```
+
+#### Verificar configuración
 ```bash
 # Verificar conexión GroqCloud
 python check_groq_models.py
@@ -150,20 +189,28 @@ python check_groq_models.py
 # Verificar estado RAG
 python manage_rag.py status
 
-# Reindexar documentos
-python manage_rag.py clean
-python manage_rag.py create-examples
-python manage_rag.py index
-
 # Probar API básica
 python test_groq_api.py -m "Hola" --list-models
 ```
 
-### Errores comunes:
-- **FAISS no disponible**: `pip install faiss-cpu`
-- **Clave API inválida**: Verificar `.env`
-- **RAG no funciona**: Ejecutar `python manage_rag.py index`
+#### Reindexar documentos RAG
+```bash
+python manage_rag.py clean
+python manage_rag.py create-examples
+python manage_rag.py index
+```
 
+### Dependencias faltantes:
+```bash
+# Si falta FAISS
+pip install faiss-cpu
+
+# Si falta SentenceTransformers
+pip install sentence-transformers
+
+# Reinstalar todas las dependencias
+pip install -r requirements.txt --force-reinstall
+```
 
 ## 📜 Licencia
 
