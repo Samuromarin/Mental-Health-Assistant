@@ -33,7 +33,7 @@ os.makedirs(os.path.join(DATA_DIR, "documents"), exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "faiss_index"), exist_ok=True)
 
 
-# Crisis detection keywords
+# Crisis detection keywords configuration
 CRISIS_KEYWORDS = [
     "suicidio", "matarme", "quitarme la vida", "no quiero vivir", 
     "autolesión", "cortarme", "hacerme daño", "morir", "acabar con todo",

@@ -16,14 +16,13 @@ from src.utils.groq_client import GroqClient
 from src.config.settings import MENTAL_HEALTH_CATEGORIES, RESOURCES, GROQ_MODELS
 from src.utils.safety import detect_crisis, get_crisis_response
 
-# CSS personalizado con tonos naranja suaves
+# CSS personalizado simplificado para mejor compatibilidad móvil
 custom_css = """
 /* Variables CSS para tonos naranja suaves */
 :root {
     --primary-orange: #ff7b42;      
     --light-orange: #FF8F39;        
     --very-light-orange: #FFEDE0;   
-    --orange-hover: #E55A00;        
     --orange-accent: #FFD4A3;       
     --warm-white: #FFF8F3;          
 }
@@ -39,186 +38,30 @@ custom_css = """
     background: linear-gradient(90deg, var(--primary-orange) 0%, var(--light-orange) 100%);
     color: white;
     padding: 20px;
-    border-radius: 15px 15px 0 0;
-    margin-bottom: 0px;
+    border-radius: 15px;
+    margin-bottom: 20px;
     box-shadow: 0 4px 15px rgba(255, 140, 66, 0.2);
 }
 
-/* Botón principal de envío */
-.primary-button {
-    background: linear-gradient(45deg, var(--primary-orange) 0%, var(--light-orange) 100%);
-    border: none;
-    color: white;
-    font-weight: 600;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(255, 140, 66, 0.3);
-}
-
-.primary-button:hover {
-    background: linear-gradient(45deg, var(--orange-hover) 0%, var(--primary-orange) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 140, 66, 0.4);
-}
-
-/* Botones secundarios */
-.secondary-button {
-    background: var(--orange-accent);
-    border: 2px solid var(--light-orange);
-    color: var(--text-dark);
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.secondary-button:hover {
-    background: var(--light-orange);
-    color: white;
-    transform: translateY(-1px);
-}
-
-/* Área de chat */
-.chat-container {
-    background: white;
-    border-radius: 15px;
-    border: 2px solid var(--border-light);
-    box-shadow: 0 4px 20px rgba(255, 140, 66, 0.1);
-}
-
-/* Input de texto */
-.message-input {
-    border: 2px solid var(--orange-accent);
-    border-radius: 12px;
-    padding: 12px;
-    transition: all 0.3s ease;
-}
-
-.message-input:focus {
-    border-color: var(--primary-orange);
-    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
-}
-
-/* Radio buttons y selectores */
-.radio-group label {
-    background: white;
-    border: 2px solid var(--orange-accent);
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin: 4px;
-    transition: all 0.3s ease;
-    color: var(--text-dark);
-    font-weight: 500;
-}
-
-.radio-group label:hover {
-    background: var(--very-light-orange);
-    border-color: var(--light-orange);
-}
-
-.radio-group input[type="radio"]:checked + label {
-    background: var(--primary-orange) !important;
-    color: white !important;
-    border-color: var(--primary-orange) !important;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
-}
-
-/* Dropdown */
-.dropdown-container select {
-    border: 2px solid var(--orange-accent);
-    border-radius: 8px;
-    background: white;
-    padding: 8px;
-}
-
-/* Accordions */
-.accordion {
-    border: 2px solid var(--border-light);
-    border-radius: 12px;
-    background: white;
-    margin: 10px 0;
-}
-
-.accordion-header {
-    background: var(--orange-accent);
-    color: var(--text-dark);
-    padding: 12px;
-    border-radius: 10px 10px 0 0;
-    font-weight: 600;
-}
-
-/* Sliders */
-.slider-container input[type="range"] {
-    -webkit-appearance: none;
-    background: var(--orange-accent);
-    border-radius: 10px;
-    height: 8px;
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    background: var(--primary-orange);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-/* Mensajes del chat */
-.message.user {
-    background: var(--orange-accent);
-    border-left: 4px solid var(--primary-orange);
-    border-radius: 0 15px 15px 15px;
-    padding: 12px;
-    margin: 8px 0;
-}
-
-.message.bot {
-    background: white;
-    border-left: 4px solid var(--light-orange);
-    border-radius: 15px 0 15px 15px;
-    padding: 12px;
-    margin: 8px 0;
-    box-shadow: 0 2px 8px rgba(255, 140, 66, 0.1);
-}
-
-/* Animaciones suaves */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .gradio-container {
-        padding: 10px;
-    }
-    
-    .main-header {
-        padding: 15px;
-    }
-}
-
-/* Personalización específica de Gradio */
+/* Botones de Gradio simplificados */
 .gr-button {
     border-radius: 8px !important;
-    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
 }
 
-.gr-button.gr-button-primary {
-    background: linear-gradient(45deg, var(--primary-orange), var(--light-orange)) !important;
+.gr-button-primary {
+    background: var(--primary-orange) !important;
+    color: white !important;
     border: none !important;
 }
 
-.gr-button.gr-button-secondary {
+.gr-button-secondary {
     background: var(--orange-accent) !important;
-    border: 2px solid var(--light-orange) !important;
-    color: var(--text-dark) !important;
+    border: 1px solid var(--light-orange) !important;
+    color: #333 !important;
 }
 
+/* Input de texto */
 .gr-textbox {
     border: 2px solid var(--orange-accent) !important;
     border-radius: 8px !important;
@@ -226,6 +69,47 @@ custom_css = """
 
 .gr-textbox:focus {
     border-color: var(--primary-orange) !important;
+}
+
+/* Radio buttons simplificados */
+.gr-radio label {
+    background: white !important;
+    border: 2px solid var(--orange-accent) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    margin: 4px !important;
+}
+
+.gr-radio input:checked + label {
+    background: var(--primary-orange) !important;
+    color: white !important;
+    border-color: var(--primary-orange) !important;
+}
+
+/* Responsive design mejorado */
+@media (max-width: 768px) {
+    .gradio-container {
+        padding: 10px;
+    }
+    
+    .main-header {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .gr-button {
+        font-size: 14px !important;
+        padding: 10px !important;
+        margin: 5px 2px !important;
+    }
+    
+    .gr-radio label {
+        font-size: 14px !important;
+        padding: 10px !important;
+        margin: 3px !important;
+        display: block !important;
+        width: 100% !important;
+    }
 }
 """
 

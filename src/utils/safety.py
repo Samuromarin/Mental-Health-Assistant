@@ -5,15 +5,6 @@ Módulo de seguridad para detectar mensajes de crisis y manejarlos adecuadamente
 from typing import Tuple, List
 
 def detect_crisis(message: str) -> Tuple[bool, List[str]]:
-    """
-    Detecta palabras clave de crisis en el mensaje del usuario
-    
-    Args:
-        message: Mensaje del usuario
-    
-    Returns:
-        Tupla con (crisis_detectada, palabras_clave_encontradas)
-    """
     from src.config.settings import CRISIS_KEYWORDS
     
     message_lower = message.lower()
