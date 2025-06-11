@@ -23,56 +23,54 @@ def detect_crisis(message: str) -> Tuple[bool, List[str]]:
 
 def get_crisis_response(keywords: List[str]) -> str:
     """
-    Genera una respuesta de protocolo de crisis basada en las palabras clave detectadas
-    
-    Args:
-        keywords: Lista de palabras clave detectadas
-    
-    Returns:
-        Mensaje de respuesta a la crisis
+    Genera una respuesta de protocolo de crisis mejorada
     """
     from src.config.settings import EMERGENCY_NUMBERS
     
-    # Clasificar tipo de crisis para una respuesta más específica
-    is_suicide_risk = any(word in keywords for word in ["suicidio", "matarme", "quitarme la vida", "no quiero vivir"])
+    # Detectar si es riesgo alto
+    high_risk_words = ["suicidio", "matarme", "quitarme la vida", "quiero morir","autolesión", "cortarme", "hacerme daño", "morir", "acabar con todo"]
+    is_high_risk = any(word in keywords for word in high_risk_words)
     
-    response = """
-    **Mensaje importante de seguridad**
-    
-    He detectado contenido en tu mensaje que puede indicar que estás pasando por un momento difícil.
-    """
-    
-    # Mensaje específico según tipo de crisis
-    if is_suicide_risk:
-        response += """
-    Es muy importante que sepas que hay ayuda disponible inmediatamente para ti. 
-    Tus sentimientos son válidos, pero hay profesionales preparados para ayudarte 
-    a superarlos y encontrar otras perspectivas.
+    if is_high_risk:
+        response = """
+🚨 **SITUACIÓN DE CRISIS DETECTADA**
+
+He detectado que podrías estar en riesgo inmediato. Es MUY IMPORTANTE que busques ayuda AHORA:
+
+📞 **CONTACTO INMEDIATO:**
+- Emergencias: 112
+- Línea Prevención Suicidio: 024 (24h, gratuita)
+
+🆘 **Si estás en peligro, ve al hospital más cercano**
         """
     else:
-        response += """
-    Es importante que sepas que hay ayuda disponible y que no estás solo/a 
-    en lo que estás experimentando.
+        response = """
+**Mensaje importante de seguridad**
+
+He detectado contenido que indica que estás pasando por un momento muy difícil.
+Es importante que sepas que hay ayuda disponible:
         """
     
-    # Incluir recursos de ayuda
+    # Recursos comunes para ambos casos
     response += f"""
-    Recursos de ayuda inmediata:
-    
-    - Teléfono de Emergencias: {EMERGENCY_NUMBERS['general']}
-    - Línea de Prevención del Suicidio: {EMERGENCY_NUMBERS['suicide_prevention']}
-    """
+
+📞 **Recursos de ayuda:**
+- Emergencias: {EMERGENCY_NUMBERS['general']}
+- Línea Prevención Suicidio: {EMERGENCY_NUMBERS['suicide_prevention']} (24h)
+- Salud Mental España: {EMERGENCY_NUMBERS['mental_health']}
+- Teléfono ANAR (jóvenes): {EMERGENCY_NUMBERS['youth_phone']}
+- Online: {EMERGENCY_NUMBERS['online_chat']}
+"""
     
     if "gender_violence" in EMERGENCY_NUMBERS and any(word in keywords for word in ["violencia", "maltrato", "abusan"]):
-        response += f"- Línea contra la Violencia de Género: {EMERGENCY_NUMBERS['gender_violence']}\n"
+        response += f"• Violencia de Género: {EMERGENCY_NUMBERS['gender_violence']}\n"
     
     response += """
-    Este asistente no está diseñado para manejar situaciones de crisis y no reemplaza 
-    la ayuda profesional. Si estás en peligro inmediato, por favor contacta con los 
-    servicios de emergencia.
-    
-    Si quieres seguir conversando sobre temas generales de salud mental una vez 
-    hayas buscado apoyo profesional, estaré aquí para ayudarte.
+Este asistente no está diseñado para manejar situaciones de crisis y no reemplaza 
+la ayuda profesional. Si estás en peligro inmediato, contacta con los servicios 
+de emergencia.
+
+Tu vida tiene valor. No estás solo/a.
     """
     
     return response

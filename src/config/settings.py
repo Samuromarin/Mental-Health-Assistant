@@ -32,20 +32,24 @@ os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "documents"), exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "faiss_index"), exist_ok=True)
 
-# Configuración de seguridad
+
+# Crisis detection keywords
 CRISIS_KEYWORDS = [
     "suicidio", "matarme", "quitarme la vida", "no quiero vivir", 
     "autolesión", "cortarme", "hacerme daño", "morir", "acabar con todo",
     "no tiene sentido seguir", "nadie me extrañaría", "mejor sin mí",
-    "no puedo más", "ya no aguanto"
+    "no puedo más", "ya no aguanto", "quiero morir", "soy una carga", "no hay salida", 
+    "herirme", "lastimarme", "sin esperanza", "adiós para siempre", "no resisto más"
 ]
 
 # Números de emergencia (España)
 EMERGENCY_NUMBERS = {
-    "general": "112",
-    "suicide_prevention": "024",
-    "mental_health": "900 10 22 10",
-    "gender_violence": "016"
+    "general": "112", # Emergencias
+    "suicide_prevention": "024", # Línea de atención al suicidio 24h
+    "mental_health": "900 10 22 10", # Salud Mental España
+    "gender_violence": "016",   # Violencia de género
+    "youth_phone": "900 20 20 10",  # Teléfono ANAR
+    "online_chat": "https://www.telefonodelaesperanza.org/"
 }
 
 # Configuración de modelos disponibles en tu cuenta GroqCloud
