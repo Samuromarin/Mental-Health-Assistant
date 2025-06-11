@@ -180,23 +180,18 @@ def create_mental_health_interface():
         )
     ) as demo:
         
-        # Encabezado principal mejorado
-        with gr.Row(elem_classes="main-header fade-in"):
-            gr.HTML("""
-            <div style="text-align: center;">
-                <h1 style="margin: 0; font-size: 2.5em; font-weight: 700;">
-                    🧠 Asistente Virtual de Salud Mental
-                </h1>
-            </div>
-            """)
-        
-        # Aviso de seguridad con estilo mejorado
+        # Header y disclaimer combinados SIN espacio
         gr.HTML("""
+        <div class="main-header fade-in" style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin: 8px; font-size: 2.5em; font-weight: 900;">
+                🧠 Asistente Virtual de Salud Mental
+            </h1>
+        </div>
         <div style="background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A6 100%); 
                     border-left: 4px solid #FF8C42; 
                     padding: 15px; 
                     border-radius: 8px; 
-                    margin: 15px 0;
+                    margin: 0 0 15px 0;
                     box-shadow: 0 2px 8px rgba(255, 140, 66, 0.1);">
             <p style="margin: 0; color: #5D4E37; font-weight: 500;">
                 ⚠️ <strong>Importante:</strong> Este asistente proporciona apoyo emocional y psicoeducación, 
