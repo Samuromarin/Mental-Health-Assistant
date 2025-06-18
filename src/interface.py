@@ -231,7 +231,7 @@ def create_mental_health_interface():
         # Área de chat con estilo mejorado
         with gr.Row():
             chatbot = gr.Chatbot(
-                height=500, 
+                height=700, 
                 show_label=False,
                 elem_classes="chat-container",
                 avatar_images=(None,None)

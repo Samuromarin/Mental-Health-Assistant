@@ -15,7 +15,7 @@ class GroqClient:
     def __init__(self, 
                  api_key: Optional[str] = None, 
                  api_base: Optional[str] = None,
-                 enable_rag: bool = True):
+                 enable_rag: bool = True): 
         """
         Inicializa el cliente de GroqCloud
         
