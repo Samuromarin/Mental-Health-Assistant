@@ -91,13 +91,13 @@ custom_css = """
     }
     
     .gr-button {
-        font-size: 14px !important;
+        font-size: 20x !important;
         padding: 10px !important;
         margin: 5px 2px !important;
     }
     
     .gr-radio label {
-        font-size: 14px !important;
+        font-size: 20px !important;
         padding: 10px !important;
         margin: 3px !important;
         display: block !important;
@@ -225,7 +225,7 @@ def create_mental_health_interface():
         # Chat area
         with gr.Row():
             chatbot = gr.Chatbot(
-                height=500, 
+                height=600, 
                 show_label=False,
                 elem_classes="chat-container",
                 avatar_images=(None,None),
@@ -494,7 +494,7 @@ def create_mental_health_interface():
                 [btn],
                 [msg]
             )
-            
+
         demo.load(
             lambda: update_examples("General"),
             outputs=example_btns
