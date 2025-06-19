@@ -265,6 +265,13 @@ def create_mental_health_interface():
             
             with gr.Row():
                 example_btns = []
+                general_examples = examples.get("General", [
+                    "Could you give me some tips to improve my emotional well-being?",
+                    "What daily habits are good for mental health?", 
+                    "How can I know if I need professional help?"
+                ])
+
+                
                 for i in range(3):
                     btn = gr.Button(
                         "Example", 
@@ -431,7 +438,7 @@ def create_mental_health_interface():
             while len(category_examples) < 3:
                 category_examples.append("How can I improve my emotional well-being?")
             
-            return [category_examples[0], category_examples[1], category_examples[2]]
+            return [gr.update(value=category_examples[0]), gr.update(value=category_examples[1]), gr.update(value=category_examples[2])]
         
         # Function to use an example as message
         def use_example(example_text):
@@ -487,7 +494,11 @@ def create_mental_health_interface():
                 [btn],
                 [msg]
             )
-        
+            
+        demo.load(
+            lambda: update_examples("General"),
+            outputs=example_btns
+        )
     return demo
 
 if __name__ == "__main__":
