@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script para verificar la conexión con GroqCloud y listar los modelos disponibles.
+Script to verify the connection with GroqCloud and list available models.
 """
 
 import os
@@ -8,113 +8,113 @@ import sys
 import requests
 from dotenv import load_dotenv
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
 def main():
-    # Obtener la clave API
+    # Get the API key
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        print("❌ Error: No se ha encontrado la clave API de GroqCloud")
-        print("Por favor, configura la variable de entorno GROQ_API_KEY en el archivo .env")
+        print("❌ Error: GroqCloud API key not found")
+        print("Please configure the GROQ_API_KEY environment variable in the .env file")
         return 1
     
-    # Endpoint para listar modelos
+    # Endpoint to list models
     url = "https://api.groq.com/openai/v1/models"
     
-    # Cabeceras de la solicitud
+    # Request headers
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     
-    print("🔄 Conectando con GroqCloud para listar modelos disponibles...")
+    print("🔄 Connecting to GroqCloud to list available models...")
     
     try:
-        # Realizar la solicitud
+        # Make the request
         response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()  # Lanzar excepción si hay error HTTP
+        response.raise_for_status()  # Raise exception if HTTP error
         
-        # Procesar la respuesta
+        # Process the response
         models_data = response.json()
         
-        print("✅ Conexión exitosa!")
-        print("\n📋 Modelos disponibles en tu cuenta de GroqCloud:")
+        print("✅ Connection successful!")
+        print("\n📋 Available models in your GroqCloud account:")
         
         if "data" in models_data and isinstance(models_data["data"], list):
             for model in models_data["data"]:
-                model_id = model.get("id", "Sin ID")
+                model_id = model.get("id", "No ID")
                 print(f"- {model_id}")
                 
-                # Mostrar detalles adicionales si están disponibles
+                # Show additional details if available
                 if "created" in model:
                     created_timestamp = model["created"]
-                    print(f"  • Creado: {created_timestamp}")
+                    print(f"  • Created: {created_timestamp}")
                 
                 if "owned_by" in model:
                     owned_by = model["owned_by"]
-                    print(f"  • Propietario: {owned_by}")
+                    print(f"  • Owner: {owned_by}")
                 
-                print("")  # Línea en blanco para separar modelos
+                print("") 
             
-            print("\n💡 Consejo: Usa exactamente estos IDs de modelos en tu configuración")
-            print("   Actualiza el archivo src/config/settings.py con estos valores")
+            print("\n💡 Tip: Use exactly these model IDs in your configuration")
+            print("   Update the src/config/settings.py file with these values")
         else:
-            print("⚠️ Estructura de respuesta inesperada. Respuesta completa:")
+            print("⚠️ Unexpected response structure. Full response:")
             print(models_data)
     
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error al conectar con GroqCloud: {e}")
+        print(f"❌ Error connecting to GroqCloud: {e}")
         if hasattr(e, 'response') and e.response:
-            print(f"Detalles del error: {e.response.text}")
+            print(f"Error details: {e.response.text}")
         return 1
     
-    # Probar una solicitud simple de chat completion
-    print("\n🔄 Probando una solicitud simple de chat completion...")
+    # Test a simple chat completion request
+    print("\n🔄 Testing a simple chat completion request...")
     
     try:
-        # Usar el primer modelo de la lista
+        # Use the first model from the list
         if "data" in models_data and models_data["data"]:
             model_id = models_data["data"][0]["id"]
             
-            # Endpoint para chat completions
+            # Endpoint for chat completions
             chat_url = "https://api.groq.com/openai/v1/chat/completions"
             
-            # Cuerpo de la solicitud
+            # Request body
             data = {
                 "model": model_id,
                 "messages": [
-                    {"role": "system", "content": "Eres un asistente útil."},
-                    {"role": "user", "content": "Hola, ¿cómo estás?"}
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": "Hello, how are you?"}
                 ],
                 "temperature": 0.7,
                 "max_tokens": 50
             }
             
-            print(f"Usando modelo: {model_id}")
+            print(f"Using model: {model_id}")
             
-            # Realizar la solicitud
+            # Make the request
             response = requests.post(chat_url, headers=headers, json=data, timeout=30)
-            response.raise_for_status()  # Lanzar excepción si hay error HTTP
+            response.raise_for_status()  # Raise exception if HTTP error
             
-            # Procesar la respuesta
+            # Process the response
             chat_response = response.json()
             
-            print("✅ Solicitud de chat completion exitosa!")
+            print("✅ Chat completion request successful!")
             
             if "choices" in chat_response and len(chat_response["choices"]) > 0:
                 message_content = chat_response["choices"][0]["message"]["content"]
-                print(f"\nRespuesta: {message_content}")
+                print(f"\nResponse: {message_content}")
             else:
-                print("⚠️ Estructura de respuesta inesperada. Respuesta completa:")
+                print("⚠️ Unexpected response structure. Full response:")
                 print(chat_response)
         else:
-            print("⚠️ No se encontraron modelos para probar")
+            print("⚠️ No models found to test")
     
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error al realizar solicitud de chat completion: {e}")
+        print(f"❌ Error making chat completion request: {e}")
         if hasattr(e, 'response') and e.response:
-            print(f"Detalles del error: {e.response.text}")
+            print(f"Error details: {e.response.text}")
         return 1
     
     return 0

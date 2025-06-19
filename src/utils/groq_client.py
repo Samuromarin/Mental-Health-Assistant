@@ -1,6 +1,5 @@
 """
-Cliente para interactuar con la API de GroqCloud para el asistente de salud mental
-Versión actualizada con soporte para RAG (Retrieval-Augmented Generation)
+Client to interact with the GroqCloud API
 """
 
 import os
@@ -10,19 +9,19 @@ import logging
 from typing import List, Dict, Any, Optional, Union
 
 class GroqClient:
-    """Cliente para interactuar con la API de GroqCloud con soporte RAG"""
+    """Client to interact with the GroqCloud API with RAG support"""
     
     def __init__(self, 
                  api_key: Optional[str] = None, 
                  api_base: Optional[str] = None,
                  enable_rag: bool = True): 
         """
-        Inicializa el cliente de GroqCloud
+        Initializes the GroqCloud client
         
         Args:
-            api_key: Clave API de GroqCloud. Si no se proporciona, se usa la de settings.
-            api_base: URL base de la API. Si no se proporciona, se usa la de settings.
-            enable_rag: Si activar RAG o no
+            api_key: GroqCloud API key. If not provided, uses the one from settings.
+            api_base: API base URL. If not provided, uses the one from settings.
+            enable_rag: Whether to enable RAG or not
         """
         from src.config.settings import GROQ_API_KEY, GROQ_API_BASE, GROQ_MODELS
 
@@ -32,34 +31,34 @@ class GroqClient:
         self.enable_rag = enable_rag
         
         if not self.api_key:
-            raise ValueError("No se ha proporcionado una clave API para GroqCloud. "
-                           "Configúrala en el archivo .env o pásala como parámetro.")
+            raise ValueError("No API key has been provided for GroqCloud. "
+                           "Configure it in the .env file or pass it as a parameter.")
         
-        # Configurar logging
+        # Configure logging
         self.logger = logging.getLogger(__name__)
         
-        # Inicializar RAG Manager si está habilitado
+        # Initialize RAG Manager if enabled
         self.rag_manager = None
         if self.enable_rag:
             self._initialize_rag()
     
     def _initialize_rag(self):
-        """Inicializa el gestor RAG"""
+        """Initializes the RAG manager"""
         try:
             from src.utils.rag_manager import initialize_rag_manager
             
             self.rag_manager = initialize_rag_manager()
             if self.rag_manager:
-                self.logger.info("RAG Manager inicializado correctamente")
+                self.logger.info("RAG Manager initialized correctly")
             else:
-                self.logger.warning("No se pudo inicializar RAG Manager")
+                self.logger.warning("Could not initialize RAG Manager")
                 self.enable_rag = False
                 
         except ImportError as e:
-            self.logger.warning(f"RAG no disponible (dependencias faltantes): {e}")
+            self.logger.warning(f"RAG not available (missing dependencies): {e}")
             self.enable_rag = False
         except Exception as e:
-            self.logger.error(f"Error inicializando RAG: {e}")
+            self.logger.error(f"Error initializing RAG: {e}")
             self.enable_rag = False
     
     def chat_completion(self, 
@@ -70,37 +69,37 @@ class GroqClient:
                        retry_attempts: int = 3,
                        retry_delay: float = 1.0) -> Dict[str, Any]:
         """
-        Envía una solicitud de chat completion a GroqCloud
+        Sends a chat completion request to GroqCloud
         
         Args:
-            messages: Lista de mensajes en formato OpenAI
-            model_id: ID del modelo a usar. Por defecto usa el primero disponible.
-            temperature: Temperatura para la generación. Por defecto 0.7.
-            max_tokens: Máximo de tokens a generar. Por defecto 500.
-            retry_attempts: Número de intentos si falla la solicitud
-            retry_delay: Segundos entre reintentos
+            messages: List of messages in OpenAI format
+            model_id: Model ID to use. By default uses the first available.
+            temperature: Temperature for generation. Default 0.7.
+            max_tokens: Maximum tokens to generate. Default 500.
+            retry_attempts: Number of attempts if request fails
+            retry_delay: Seconds between retries
             
         Returns:
-            Respuesta de la API como diccionario
+            API response as dictionary
         """
         if not model_id:
             model_id = next(iter(self.models.keys()))
             
-        # Asegurarse de que es un modelo disponible en Groq
+        # Ensure it's a model available in Groq
         if model_id not in self.models:
             model_id = next(iter(self.models.keys()))
-            self.logger.warning(f"Modelo no disponible en Groq. Usando {model_id} en su lugar.")
+            self.logger.warning(f"Model not available in Groq. Using {model_id} instead.")
         
-        # Endpoint para chat completions
+        # Endpoint for chat completions
         url = f"{self.api_base}/chat/completions"
         
-        # Cabeceras
+        # Headers
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
         
-        # Cuerpo de la solicitud
+        # Request body
         data = {
             "model": model_id,
             "messages": messages,
@@ -108,15 +107,15 @@ class GroqClient:
             "max_tokens": max_tokens
         }
         
-        # Implementamos reintento con backoff exponencial
+        # Implement retry with exponential backoff
         attempts = 0
         last_error = None
         
         while attempts < retry_attempts:
             try:
-                # Realizar la solicitud
+                # Make the request
                 response = requests.post(url, headers=headers, json=data, timeout=30)
-                response.raise_for_status()  # Lanzar excepción si hay error HTTP
+                response.raise_for_status()  # Raise exception if HTTP error
                 
                 return response.json()
                 
@@ -124,26 +123,26 @@ class GroqClient:
                 last_error = e
                 attempts += 1
                 
-                # Registrar el error
-                self.logger.warning(f"Intento {attempts}/{retry_attempts} falló: {e}")
+                # Log the error
+                self.logger.warning(f"Attempt {attempts}/{retry_attempts} failed: {e}")
                 if hasattr(e, 'response') and e.response:
-                    self.logger.warning(f"Detalles del error: {e.response.text}")
+                    self.logger.warning(f"Error details: {e.response.text}")
                 
-                # Si hemos agotado los intentos, propagar la excepción
+                # If we've exhausted attempts, propagate the exception
                 if attempts >= retry_attempts:
                     break
                     
-                # Esperar con backoff exponencial antes de reintentar
+                # Wait with exponential backoff before retrying
                 wait_time = retry_delay * (2 ** (attempts - 1))
-                self.logger.info(f"Reintentando en {wait_time:.1f} segundos...")
+                self.logger.info(f"Retrying in {wait_time:.1f} seconds...")
                 time.sleep(wait_time)
         
-        # Si llegamos aquí, todos los intentos fallaron
+        # If we reach here, all attempts failed
         return {
             "error": str(last_error),
             "choices": [{
                 "message": {
-                    "content": "Lo siento, estoy teniendo problemas para conectarme. Por favor, inténtalo de nuevo más tarde."
+                    "content": "I'm sorry, I'm having connection problems. Please try again later."
                 }
             }]
         }
@@ -156,55 +155,55 @@ class GroqClient:
                                        max_tokens: int = 500,
                                        use_rag: bool = True) -> str:
         """
-        Genera una respuesta específica para salud mental con soporte RAG
+        Generates a specific mental health response with RAG support
         
         Args:
-            user_message: Mensaje del usuario
-            category: Categoría de salud mental. Por defecto "General".
-            model_id: ID del modelo a usar. Por defecto usa el primero disponible.
-            temperature: Temperatura para la generación. Por defecto 0.7.
-            max_tokens: Máximo de tokens a generar. Por defecto 500.
-            use_rag: Si usar RAG para esta consulta
+            user_message: User message
+            category: Mental health category. Default "General".
+            model_id: Model ID to use. Default uses the first available.
+            temperature: Temperature for generation. Default 0.7.
+            max_tokens: Maximum tokens to generate. Default 500.
+            use_rag: Whether to use RAG for this query
             
         Returns:
-            Respuesta generada como texto
+            Generated response as text
         """
         from src.config.settings import SYSTEM_MESSAGES
         
-        # Obtener el mensaje del sistema para la categoría
+        # Get the system message for the category
         system_message = SYSTEM_MESSAGES.get(category, SYSTEM_MESSAGES["General"])
         
-        # Si RAG está habilitado y se solicita usarlo, obtener contexto relevante
+        # If RAG is enabled and requested, get relevant context
         rag_context = ""
         if self.enable_rag and use_rag and self.rag_manager:
             try:
                 rag_context = self.rag_manager.get_context_for_query(
                     user_message, 
                     category=category,
-                    max_context_length=1500  # Limitar contexto para dejar espacio a la respuesta
+                    max_context_length=1500  # Limit context to leave space for response
                 )
                 
                 if rag_context:
-                    self.logger.info("Contexto RAG obtenido para la consulta")
+                    self.logger.info("RAG context obtained for query")
                 else:
-                    self.logger.info("No se encontró contexto RAG relevante")
+                    self.logger.info("No relevant RAG context found")
                     
             except Exception as e:
-                self.logger.error(f"Error obteniendo contexto RAG: {e}")
+                self.logger.error(f"Error getting RAG context: {e}")
                 rag_context = ""
         
-        # Construir mensaje del sistema con contexto RAG si está disponible
+        # Build system message with RAG context if available
         enhanced_system_message = system_message
         if rag_context:
-            enhanced_system_message += f"\n\n{rag_context}\n\nUsa esta información cuando sea relevante para responder la consulta del usuario."
+            enhanced_system_message += f"\n\n{rag_context}\n\nUse this information when relevant to answer the user's query."
         
-        # Crear la lista de mensajes
+        # Create message list
         messages = [
             {"role": "system", "content": enhanced_system_message},
             {"role": "user", "content": user_message}
         ]
         
-        # Enviar la solicitud
+        # Send the request
         response = self.chat_completion(
             messages, 
             model_id=model_id,
@@ -212,134 +211,134 @@ class GroqClient:
             max_tokens=max_tokens
         )
         
-        # Extraer la respuesta
+        # Extract the response
         if "choices" in response and len(response["choices"]) > 0:
             generated_response = response["choices"][0]["message"]["content"]
             
-            # Añadir nota sobre fuentes si se usó RAG
-            if rag_context and "Información relevante de la base de conocimiento:" in rag_context:
-                generated_response += "\n\n*Nota: Esta respuesta incluye información de nuestra base de conocimiento especializada.*"
+            # Add note about sources if RAG was used
+            if rag_context and "Relevant information from the knowledge base:" in rag_context:
+                generated_response += "\n\n*Note: This response includes information from our specialized knowledge base.*"
             
             return generated_response
         else:
-            return "Lo siento, estoy teniendo problemas para responder en este momento."
+            return "I'm sorry, I'm having problems responding at the moment."
     
     def get_available_models(self) -> List[str]:
         """
-        Obtiene la lista de modelos disponibles en GroqCloud
+        Gets the list of available models in GroqCloud
         
         Returns:
-            Lista de IDs de modelos disponibles
+            List of available model IDs
         """
         return list(self.models.keys())
     
     def get_model_info(self, model_id: str) -> Optional[Dict[str, Any]]:
         """
-        Obtiene información sobre un modelo específico
+        Gets information about a specific model
         
         Args:
-            model_id: ID del modelo
+            model_id: Model ID
             
         Returns:
-            Información del modelo o None si no existe
+            Model information or None if it doesn't exist
         """
         return self.models.get(model_id)
     
     def get_rag_status(self) -> Dict[str, Any]:
         """
-        Obtiene el estado del sistema RAG
+        Gets the RAG system status
         
         Returns:
-            Diccionario con información del estado RAG
+            Dictionary with RAG status information
         """
         if not self.enable_rag:
-            return {"enabled": False, "reason": "RAG deshabilitado"}
+            return {"enabled": False, "reason": "RAG disabled"}
         
         if not self.rag_manager:
-            return {"enabled": False, "reason": "RAG Manager no inicializado"}
+            return {"enabled": False, "reason": "RAG Manager not initialized"}
         
         try:
             stats = self.rag_manager.get_stats()
             return {
                 "enabled": True,
-                "status": "Funcionando",
+                "status": "Working",
                 "stats": stats
             }
         except Exception as e:
             return {
                 "enabled": False,
-                "reason": f"Error en RAG Manager: {e}"
+                "reason": f"Error in RAG Manager: {e}"
             }
     
     def index_rag_documents(self) -> bool:
         """
-        Indexa documentos en el sistema RAG
+        Indexes documents in the RAG system
         
         Returns:
-            True si se indexaron correctamente
+            True if indexed correctly
         """
         if not self.enable_rag or not self.rag_manager:
-            self.logger.warning("RAG no está habilitado")
+            self.logger.warning("RAG is not enabled")
             return False
         
         try:
             return self.rag_manager.index_documents()
         except Exception as e:
-            self.logger.error(f"Error indexando documentos: {e}")
+            self.logger.error(f"Error indexing documents: {e}")
             return False
     
     def add_rag_document(self, text: str, metadata: Dict[str, Any] = None) -> bool:
         """
-        Añade un documento al sistema RAG
+        Adds a document to the RAG system
         
         Args:
-            text: Contenido del documento
-            metadata: Metadatos del documento
+            text: Document content
+            metadata: Document metadata
             
         Returns:
-            True si se añadió correctamente
+            True if added correctly
         """
         if not self.enable_rag or not self.rag_manager:
-            self.logger.warning("RAG no está habilitado")
+            self.logger.warning("RAG is not enabled")
             return False
         
         try:
             return self.rag_manager.add_document_from_text(text, metadata)
         except Exception as e:
-            self.logger.error(f"Error añadiendo documento RAG: {e}")
+            self.logger.error(f"Error adding RAG document: {e}")
             return False
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso con RAG
+    # Example usage with RAG
     import sys
     from dotenv import load_dotenv
     
-    # Cargar variables de entorno
+    # Load environment variables
     load_dotenv()
     
-    # Crear cliente con RAG
+    # Create client with RAG
     try:
         client = GroqClient(enable_rag=True)
         
-        # Mostrar estado de RAG
+        # Show RAG status
         rag_status = client.get_rag_status()
-        print("Estado de RAG:")
+        print("RAG Status:")
         print(rag_status)
         
-        # Mostrar modelos disponibles
-        print("\nModelos disponibles:")
+        # Show available models
+        print("\nAvailable models:")
         for model_id in client.get_available_models():
             model_info = client.get_model_info(model_id)
-            print(f"- {model_id}: {model_info['name']} (contexto: {model_info['context_length']})")
+            print(f"- {model_id}: {model_info['name']} (context: {model_info['context_length']})")
         
-        # Generar respuesta con RAG
-        message = input("\nPrueba el asistente con RAG (Escribe un mensaje): ")
+        # Generate response with RAG
+        message = input("\nTest the assistant with RAG (Write a message): ")
         category = "General"
         
-        print(f"\nGenerando respuesta (Categoría: {category}, RAG: habilitado)")
+        print(f"\nGenerating response (Category: {category}, RAG: enabled)")
         response = client.generate_mental_health_response(message, category, use_rag=True)
-        print("\nRespuesta:")
+        print("\nResponse:")
         print(response)
         
         sys.exit(0)

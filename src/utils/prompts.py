@@ -1,29 +1,29 @@
 """
--Formatea mensajes para diferentes modelos de LLM, 
--Proporciona instrucciones específicas para cada categoría de salud mental
--Define ejemplos de prompts por categoría
+- Formats messages for different LLM models
+- Provides specific instructions for each mental health category
+- Defines example prompts by category
 """
 
 from src.config.settings import VICUNA_PROMPT_TEMPLATE, MENTAL_HEALTH_CATEGORIES
 
 def format_prompt_for_vicuna(message, category="General"):
     """
-    Formatea el mensaje del usuario para el modelo Vicuna,
-    optimizando para el contexto de salud mental
+    Formats the user message for the Vicuna model,
+    optimizing for mental health context
     
     Args:
-        message (str): Mensaje del usuario
-        category (str): Categoría de salud mental seleccionada
+        message (str): User message
+        category (str): Selected mental health category
     
     Returns:
-        str: Prompt formateado para Vicuna
+        str: Formatted prompt for Vicuna
     """
-    # Añadir instrucciones específicas basadas en la categoría
+    # Add specific instructions based on category
     category_instructions = get_category_specific_instructions(category)
     
-    # Si el usuario seleccionó una categoría específica, la incluimos en el contexto
+    # If user selected a specific category, include it in context
     if category != "General":
-        context_message = f"{category_instructions}\n\nEl usuario quiere hablar sobre temas relacionados con {category.lower()}:\n{message}"
+        context_message = f"{category_instructions}\n\nThe user wants to talk about topics related to {category.lower()}:\n{message}"
     else:
         context_message = f"{message}"
     
@@ -31,90 +31,90 @@ def format_prompt_for_vicuna(message, category="General"):
 
 def get_category_specific_instructions(category):
     """
-    Devuelve instrucciones específicas según la categoría de salud mental
+    Returns specific instructions according to mental health category
     
     Args:
-        category (str): Categoría de salud mental
+        category (str): Mental health category
     
     Returns:
-        str: Instrucciones específicas para esa categoría
+        str: Specific instructions for that category
     """
     instructions = {
-        "Ansiedad": """
-        Para este tema de ansiedad:
-        - Utiliza un tono calmado y valida los sentimientos del usuario.
-        - Enseña técnicas de respiración y relajación cuando sea apropiado.
-        - Explora desencadenantes específicos con preguntas abiertas.
-        - Normaliza las experiencias de ansiedad sin minimizarlas.
-        - Proporciona información precisa sobre la ansiedad y sus síntomas.
-        - Sugiere estrategias basadas en evidencia (respiración diafragmática, mindfulness, exposición gradual).
-        - Anima a buscar ayuda profesional para un tratamiento más estructurado.
+        "Anxiety": """
+        For this anxiety topic:
+        - Use a calm tone and validate the user's feelings.
+        - Teach breathing and relaxation techniques when appropriate.
+        - Explore specific triggers with open-ended questions.
+        - Normalize anxiety experiences without minimizing them.
+        - Provide accurate information about anxiety and its symptoms.
+        - Suggest evidence-based strategies (diaphragmatic breathing, mindfulness, gradual exposure).
+        - Encourage seeking professional help for more structured treatment.
         """,
         
-        "Depresión": """
-        Para este tema de depresión:
-        - Utiliza un enfoque de escucha empática y valida sus experiencias sin minimizarlas.
-        - Explora patrones de pensamiento con tacto y pregunta sobre actividades que antes disfrutaban.
-        - Mantén un tono esperanzador pero realista.
-        - Valida sus sentimientos sin perpetuar la desesperanza.
-        - Pregunta sobre pensamientos suicidas si es apropiado, recomendando ayuda inmediata si es necesario.
-        - Explora gradualmente elementos como patrones de sueño, apetito y energía.
-        - Sugiere pequeñas actividades significativas que podrían ser manejables.
+        "Depression": """
+        For this depression topic:
+        - Use an empathetic listening approach and validate their experiences without minimizing them.
+        - Explore thought patterns tactfully and ask about activities they used to enjoy.
+        - Maintain a hopeful but realistic tone.
+        - Validate their feelings without perpetuating hopelessness.
+        - Ask about suicidal thoughts if appropriate, recommending immediate help if necessary.
+        - Gradually explore elements like sleep patterns, appetite, and energy.
+        - Suggest small meaningful activities that might be manageable.
         """,
         
-        "Estrés": """
-        Para este tema de manejo del estrés:
-        - Ayuda a identificar fuentes específicas de estrés en su vida.
-        - Explora estrategias de afrontamiento existentes y su efectividad.
-        - Sugiere técnicas de mindfulness cuando sea apropiado.
-        - Enfatiza la importancia del autocuidado y los límites saludables.
-        - Normaliza el estrés como una respuesta humana natural.
-        - Distingue entre estrés agudo y crónico si es relevante.
-        - Explora cómo el estrés afecta diferentes áreas de su vida.
+        "Stress": """
+        For this stress management topic:
+        - Help identify specific sources of stress in their life.
+        - Explore existing coping strategies and their effectiveness.
+        - Suggest mindfulness techniques when appropriate.
+        - Emphasize the importance of self-care and healthy boundaries.
+        - Normalize stress as a natural human response.
+        - Distinguish between acute and chronic stress if relevant.
+        - Explore how stress affects different areas of their life.
         """,
         
-        "Relaciones": """
-        Para este tema de relaciones:
-        - Escucha sin juzgar y evita tomar partido.
-        - Ayuda a explorar patrones de comunicación en sus relaciones.
-        - Anima a considerar diferentes perspectivas.
-        - Explora cómo las dinámicas actuales pueden relacionarse con experiencias pasadas.
-        - Enfatiza la importancia de límites saludables y comunicación clara.
-        - Formula preguntas que promuevan la reflexión sobre necesidades y valores personales.
-        - Reconoce cuando pueda haber situaciones de abuso y sugiere recursos apropiados.
+        "Relationships": """
+        For this relationships topic:
+        - Listen without judgment and avoid taking sides.
+        - Help explore communication patterns in their relationships.
+        - Encourage considering different perspectives.
+        - Explore how current dynamics might relate to past experiences.
+        - Emphasize the importance of healthy boundaries and clear communication.
+        - Ask questions that promote reflection on personal needs and values.
+        - Recognize when there might be abusive situations and suggest appropriate resources.
         """,
         
-        "Autoestima": """
-        Para este tema de autoestima:
-        - Ayuda a identificar fortalezas personales y logros pasados.
-        - Cuestiona pensamientos autocríticos con gentileza.
-        - Fomenta una autoimagen más compasiva y realista.
-        - Explora el origen de creencias negativas sobre sí mismo.
-        - Distingue entre autocrítica constructiva y destructiva.
-        - Promueve la autocompasión como alternativa a la autocrítica.
-        - Sugiere prácticas como escribir diarios de gratitud o afirmaciones realistas.
+        "Self-esteem": """
+        For this self-esteem topic:
+        - Help identify personal strengths and past achievements.
+        - Question self-critical thoughts with gentleness.
+        - Encourage a more compassionate and realistic self-image.
+        - Explore the origin of negative beliefs about themselves.
+        - Distinguish between constructive and destructive self-criticism.
+        - Promote self-compassion as an alternative to self-criticism.
+        - Suggest practices like writing gratitude journals or realistic affirmations.
         """,
         
-        "Técnicas de relajación": """
-        Para este tema de técnicas de relajación:
-        - Guía en respiración profunda, relajación muscular progresiva, visualización o mindfulness.
-        - Ofrece instrucciones paso a paso cuando sea apropiado.
-        - Adapta las técnicas al contexto y preferencias específicas del usuario.
-        - Explica brevemente la base científica de las técnicas sugeridas.
-        - Anima a practicar regularmente, comenzando con sesiones cortas.
-        - Pregunta sobre experiencias previas con técnicas de relajación.
-        - Ofrece alternativas si una técnica particular no resuena con el usuario.
+        "Relaxation techniques": """
+        For this relaxation techniques topic:
+        - Guide in deep breathing, progressive muscle relaxation, visualization, or mindfulness.
+        - Offer step-by-step instructions when appropriate.
+        - Adapt techniques to the user's specific context and preferences.
+        - Briefly explain the scientific basis of suggested techniques.
+        - Encourage regular practice, starting with short sessions.
+        - Ask about previous experiences with relaxation techniques.
+        - Offer alternatives if a particular technique doesn't resonate with the user.
         """
     }
     
-    # Instrucciones generales para cualquier categoría
+    # General instructions for any category
     general_instructions = """
-    Recuerda mantener siempre una actitud empática, validar sentimientos, usar preguntas abiertas,
-    ofrecer recursos educativos apropiados, y animar a buscar ayuda profesional cuando sea necesario.
-    No diagnostiques ni reemplaces la atención profesional de salud mental.
+    Remember to always maintain an empathetic attitude, validate feelings, use open-ended questions,
+    offer appropriate educational resources, and encourage seeking professional help when necessary.
+    Do not diagnose or replace professional mental health care.
     """
     
-    # Combinar instrucciones específicas con las generales
+    # Combine specific instructions with general ones
     specific_instructions = instructions.get(category, "")
     if specific_instructions:
         return f"{specific_instructions}\n\n{general_instructions}"
@@ -123,64 +123,64 @@ def get_category_specific_instructions(category):
 
 def create_system_message(category="General"):
     """
-    Crea un mensaje de sistema para modelos compatibles con ChatCompletion
+    Creates a system message for ChatCompletion compatible models
     
     Args:
-        category (str): Categoría de salud mental
+        category (str): Mental health category
     
     Returns:
-        str: Mensaje de sistema formateado
+        str: Formatted system message
     """
-    base_system_message = """Eres un asistente de salud mental empático y respetuoso que proporciona apoyo emocional, 
-    escucha activa y psicoeducación. No proporcionas diagnósticos clínicos ni reemplazas a profesionales de la salud mental. 
-    Tu enfoque es personalizado, basado en evidencia científica, y ofreces respuestas que promueven el bienestar psicológico."""
+    base_system_message = """You are an empathetic and respectful mental health assistant that provides emotional support, 
+    active listening and psychoeducation. You do not provide clinical diagnoses or replace mental health professionals. 
+    Your approach is personalized, based on scientific evidence, and you offer responses that promote psychological well-being."""
     
-    # Añadir instrucciones específicas según la categoría
+    # Add specific instructions according to category
     category_instructions = get_category_specific_instructions(category)
     
     return f"{base_system_message}\n\n{category_instructions}"
 
 def get_example_prompts():
     """
-    Devuelve ejemplos de prompts para cada categoría
+    Returns example prompts for each category
     
     Returns:
-        dict: Diccionario con ejemplos de prompts por categoría
+        dict: Dictionary with example prompts by category
     """
     return {
         "General": [
-            "¿Podrías darme algunos consejos para mejorar mi bienestar emocional?",
-            "Últimamente no me siento bien emocionalmente, ¿qué puedo hacer?",
-            "¿Qué recursos recomiendas para aprender más sobre salud mental?"
+            "Could you give me some tips to improve my emotional well-being?",
+            "I haven't been feeling well emotionally lately, what can I do?",
+            "What resources do you recommend for learning more about mental health?"
         ],
-        "Ansiedad": [
-            "Me siento ansioso todo el tiempo, ¿qué puedo hacer?",
-            "¿Cómo puedo manejar los ataques de pánico?",
-            "Tengo miedo constante a que algo malo va a pasar"
+        "Anxiety": [
+            "I feel anxious all the time, what can I do?",
+            "How can I manage panic attacks?",
+            "I have constant fear that something bad is going to happen"
         ],
-        "Depresión": [
-            "No tengo motivación para hacer nada últimamente",
-            "¿Cómo puedo lidiar con pensamientos negativos recurrentes?",
-            "Me siento triste sin razón aparente"
+        "Depression": [
+            "I have no motivation to do anything lately",
+            "How can I deal with recurring negative thoughts?",
+            "I feel sad for no apparent reason"
         ],
-        "Estrés": [
-            "El trabajo me está causando mucho estrés, ¿cómo puedo manejarlo?",
-            "Siento que estoy siempre bajo presión",
-            "Necesito técnicas para relajarme después de un día difícil"
+        "Stress": [
+            "Work is causing me a lot of stress, how can I manage it?",
+            "I feel like I'm always under pressure",
+            "I need techniques to relax after a difficult day"
         ],
-        "Relaciones": [
-            "Tengo problemas para comunicarme con mi pareja",
-            "¿Cómo puedo establecer límites saludables con mi familia?",
-            "Me cuesta mucho confiar en los demás"
+        "Relationships": [
+            "I have problems communicating with my partner",
+            "How can I establish healthy boundaries with my family?",
+            "I have trouble trusting others"
         ],
-        "Autoestima": [
-            "Siempre me comparo con los demás y me siento inferior",
-            "¿Cómo puedo mejorar mi autoimagen?",
-            "Siento que no soy lo suficientemente bueno en nada"
+        "Self-esteem": [
+            "I always compare myself to others and feel inferior",
+            "How can I improve my self-image?",
+            "I feel like I'm not good enough at anything"
         ],
-        "Técnicas de relajación": [
-            "Necesito técnicas para calmarme rápidamente",
-            "¿Podrías guiarme en una meditación corta?",
-            "¿Qué ejercicios de respiración recomiendas para la ansiedad?"
+        "Relaxation techniques": [
+            "I need techniques to calm down quickly",
+            "Could you guide me through a short meditation?",
+            "What breathing exercises do you recommend for anxiety?"
         ]
     }
