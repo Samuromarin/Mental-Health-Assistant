@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-Script para probar la API de GroqCloud
+Script to test GroqCloud API
 
-Este script te permite probar rápidamente si tu configuración de GroqCloud funciona correctamente,
-enviando un mensaje de prueba y mostrando la respuesta.
+This script allows you to quickly test if your GroqCloud configuration works correctly,
+sending a test message and displaying the response.
 """
 
 import os
@@ -13,92 +13,92 @@ import time
 from dotenv import load_dotenv
 from typing import List, Optional
 
-# Añadir el directorio raíz al path para importaciones relativas
+# Add root directory to path for relative imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
 def parse_args():
-    """Parsea los argumentos de línea de comandos"""
-    parser = argparse.ArgumentParser(description="Prueba de la API de GroqCloud")
-    parser.add_argument("--message", "-m", type=str, help="Mensaje a enviar")
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description="GroqCloud API Test")
+    parser.add_argument("--message", "-m", type=str, help="Message to send")
     parser.add_argument("--category", "-c", type=str, default="General", 
-                       help="Categoría de salud mental: General, Ansiedad, Depresión, etc.")
-    parser.add_argument("--model", type=str, help="Modelo de GroqCloud a usar")
-    parser.add_argument("--list-models", "-l", action="store_true", help="Listar modelos disponibles")
+                       help="Mental health category: General, Anxiety, Depression, etc.")
+    parser.add_argument("--model", type=str, help="GroqCloud model to use")
+    parser.add_argument("--list-models", "-l", action="store_true", help="List available models")
     parser.add_argument("--interactive", "-i", action="store_true", 
-                       help="Modo interactivo para múltiples consultas")
+                       help="Interactive mode for multiple queries")
     parser.add_argument("--temperature", "-t", type=float, default=0.7,
-                       help="Temperatura para la generación (0.1-1.5)")
+                       help="Temperature for generation (0.1-1.5)")
     parser.add_argument("--max-tokens", "-mt", type=int, default=500,
-                       help="Número máximo de tokens en la respuesta")
+                       help="Maximum number of tokens in response")
     return parser.parse_args()
 
 def get_available_categories() -> List[str]:
-    """Obtiene las categorías disponibles desde la configuración"""
+    """Gets available categories from configuration"""
     try:
         from src.config.settings import MENTAL_HEALTH_CATEGORIES
         return MENTAL_HEALTH_CATEGORIES
     except ImportError:
-        return ["General", "Ansiedad", "Depresión", "Estrés", "Relaciones", "Autoestima", "Técnicas de relajación"]
+        return ["General", "Anxiety", "Depression", "Stress", "Relationships", "Self-esteem", "Relaxation techniques"]
 
 def validate_category(category: str) -> str:
-    """Valida que la categoría exista o devuelve 'General'"""
+    """Validates that category exists or returns 'General'"""
     categories = get_available_categories()
     if category in categories:
         return category
     
-    print(f"⚠️ Categoría '{category}' no válida. Categorías disponibles: {', '.join(categories)}")
-    print("Usando categoría 'General' por defecto.")
+    print(f"⚠️ Category '{category}' not valid. Available categories: {', '.join(categories)}")
+    print("Using 'General' category by default.")
     return "General"
 
 def interactive_mode(client, model_id: Optional[str] = None, temperature: float = 0.7, max_tokens: int = 500):
-    """Modo interactivo para múltiples consultas"""
+    """Interactive mode for multiple queries"""
     categories = get_available_categories()
     
-    print("\n===== MODO INTERACTIVO DEL ASISTENTE DE SALUD MENTAL =====")
-    print("Escribe 'salir', 'exit' o 'q' para terminar")
-    print("Escribe 'categoria' o 'category' para cambiar la categoría actual")
-    print("Escribe 'modelo' o 'model' para cambiar el modelo actual")
+    print("\n===== INTERACTIVE MODE - MENTAL HEALTH ASSISTANT =====")
+    print("Type 'exit', 'quit' or 'q' to finish")
+    print("Type 'category' to change current category")
+    print("Type 'model' to change current model")
     
     category = "General"
     
     while True:
-        print(f"\n[Categoría: {category}] [Modelo: {model_id}]")
+        print(f"\n[Category: {category}] [Model: {model_id}]")
         message = input(">>> ")
         
-        # Comandos especiales
-        if message.lower() in ["salir", "exit", "q"]:
-            print("¡Hasta pronto!")
+        # Special commands
+        if message.lower() in ["exit", "quit", "q"]:
+            print("See you later!")
             break
         
-        elif message.lower() in ["categoria", "category"]:
-            print(f"Categorías disponibles: {', '.join(categories)}")
-            new_category = input("Nueva categoría: ")
+        elif message.lower() in ["category"]:
+            print(f"Available categories: {', '.join(categories)}")
+            new_category = input("New category: ")
             if new_category in categories:
                 category = new_category
-                print(f"Categoría cambiada a: {category}")
+                print(f"Category changed to: {category}")
             else:
-                print(f"⚠️ Categoría no válida. Sigue usando: {category}")
+                print(f"⚠️ Invalid category. Still using: {category}")
             continue
         
-        elif message.lower() in ["modelo", "model"]:
+        elif message.lower() in ["model"]:
             models = client.get_available_models()
-            print(f"Modelos disponibles: {', '.join(models)}")
-            new_model = input("Nuevo modelo: ")
+            print(f"Available models: {', '.join(models)}")
+            new_model = input("New model: ")
             if new_model in models:
                 model_id = new_model
-                print(f"Modelo cambiado a: {model_id}")
+                print(f"Model changed to: {model_id}")
             else:
-                print(f"⚠️ Modelo no válido. Sigue usando: {model_id}")
+                print(f"⚠️ Invalid model. Still using: {model_id}")
             continue
         
         elif not message.strip():
             continue
         
-        # Enviar mensaje
-        print("🤔 Generando respuesta...")
+        # Send message
+        print("🤔 Generating response...")
         start_time = time.time()
         
         try:
@@ -115,63 +115,63 @@ def interactive_mode(client, model_id: Optional[str] = None, temperature: float 
             print("\n" + "=" * 80)
             print(response)
             print("=" * 80)
-            print(f"⏱️  Tiempo: {elapsed_time:.2f} segundos")
+            print(f"⏱️  Time: {elapsed_time:.2f} seconds")
         
         except Exception as e:
             print(f"❌ Error: {e}")
 
 def main():
-    """Función principal"""
+    """Main function"""
     args = parse_args()
     
     try:
-        # Importar el cliente de GroqCloud
+        # Import GroqCloud client
         from src.utils.groq_client import GroqClient
         
-        # Crear cliente
+        # Create client
         client = GroqClient()
         
-        # Listar modelos si se solicitó
+        # List models if requested
         if args.list_models:
-            print("📋 Modelos disponibles en GroqCloud:")
+            print("📋 Available models in GroqCloud:")
             for model_id in client.get_available_models():
                 model_info = client.get_model_info(model_id)
-                print(f"- {model_id}: {model_info['name']} (contexto: {model_info['context_length']} tokens)")
+                print(f"- {model_id}: {model_info['name']} (context: {model_info['context_length']} tokens)")
                 print(f"  {model_info['description']}")
             return 0
         
-        # Validar categoría
+        # Validate category
         category = validate_category(args.category)
         
-        # Determinar qué modelo usar
+        # Determine which model to use
         model = args.model
         if not model:
-            # Usar el primer modelo disponible
+            # Use first available model
             model = client.get_available_models()[0]
         
-        # Modo interactivo
+        # Interactive mode
         if args.interactive:
             interactive_mode(client, model, args.temperature, args.max_tokens)
             return 0
         
-        # Modo de mensaje único
-        # Si no se proporcionó mensaje, solicitar uno
+        # Single message mode
+        # If no message provided, request one
         message = args.message
         if not message:
-            message = input("Escribe tu mensaje: ")
+            message = input("Write your message: ")
         
-        # Mostrar información
-        print(f"🔄 Enviando mensaje a GroqCloud...")
-        print(f"📝 Mensaje: {message}")
-        print(f"🧠 Modelo: {model}")
-        print(f"📚 Categoría: {category}")
-        print(f"🌡️ Temperatura: {args.temperature}")
-        print(f"🔢 Tokens máximos: {args.max_tokens}")
+        # Show information
+        print(f"🔄 Sending message to GroqCloud...")
+        print(f"📝 Message: {message}")
+        print(f"🧠 Model: {model}")
+        print(f"📚 Category: {category}")
+        print(f"🌡️ Temperature: {args.temperature}")
+        print(f"🔢 Max tokens: {args.max_tokens}")
         
-        # Iniciar temporizador
+        # Start timer
         start_time = time.time()
         
-        # Enviar solicitud
+        # Send request
         response = client.generate_mental_health_response(
             message,
             category=category,
@@ -180,16 +180,16 @@ def main():
             max_tokens=args.max_tokens
         )
         
-        # Calcular tiempo
+        # Calculate time
         elapsed_time = time.time() - start_time
         
-        # Mostrar respuesta
+        # Show response
         print("\n" + "=" * 80)
-        print("✅ Respuesta recibida:")
+        print("✅ Response received:")
         print("-" * 80)
         print(response)
         print("=" * 80)
-        print(f"⏱️  Tiempo de respuesta: {elapsed_time:.2f} segundos")
+        print(f"⏱️  Response time: {elapsed_time:.2f} seconds")
         
         return 0
     except Exception as e:

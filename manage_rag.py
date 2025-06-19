@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script para gestionar el sistema RAG con FAISS (versión simplificada y confiable)
+Script to manage RAG system with FAISS
 """
 
 import os
@@ -9,84 +9,84 @@ import argparse
 from pathlib import Path
 from typing import List, Dict
 
-# Añadir el directorio raíz al path para importaciones relativas
+# Add root directory to path for relative imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
 def parse_args():
-    """Parsea los argumentos de línea de comandos"""
-    parser = argparse.ArgumentParser(description="Gestión del sistema RAG con FAISS")
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description="RAG system management with FAISS")
     
-    # Comandos principales
-    subparsers = parser.add_subparsers(dest='command', help='Comandos disponibles')
+    # Main commands
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # Comando: status
-    status_parser = subparsers.add_parser('status', help='Ver estado del sistema RAG')
+    # Command: status
+    status_parser = subparsers.add_parser('status', help='View RAG system status')
     
-    # Comando: index
-    index_parser = subparsers.add_parser('index', help='Indexar documentos')
+    # Command: index
+    index_parser = subparsers.add_parser('index', help='Index documents')
     index_parser.add_argument('--force', '-f', action='store_true', 
-                            help='Forzar re-indexación')
+                            help='Force re-indexing')
     
-    # Comando: search
-    search_parser = subparsers.add_parser('search', help='Buscar en la base de conocimiento')
-    search_parser.add_argument('query', type=str, help='Consulta de búsqueda')
+    # Command: search
+    search_parser = subparsers.add_parser('search', help='Search in knowledge base')
+    search_parser.add_argument('query', type=str, help='Search query')
     search_parser.add_argument('--category', '-c', type=str, default='General',
-                             help='Categoría de salud mental')
+                             help='Mental health category')
     search_parser.add_argument('--k', type=int, default=3,
-                             help='Número de resultados')
+                             help='Number of results')
     
-    # Comando: add
-    add_parser = subparsers.add_parser('add', help='Añadir documento desde texto')
-    add_parser.add_argument('text', type=str, help='Texto del documento')
-    add_parser.add_argument('--title', '-t', type=str, help='Título del documento')
+    # Command: add
+    add_parser = subparsers.add_parser('add', help='Add document from text')
+    add_parser.add_argument('text', type=str, help='Document text')
+    add_parser.add_argument('--title', '-t', type=str, help='Document title')
     add_parser.add_argument('--category', '-c', type=str, default='General',
-                          help='Categoría del documento')
+                          help='Document category')
     
-    # Comando: create-examples
+    # Command: create-examples
     examples_parser = subparsers.add_parser('create-examples', 
-                                          help='Crear documentos de ejemplo')
+                                          help='Create example documents')
     examples_parser.add_argument('--overwrite', action='store_true',
-                               help='Sobrescribir documentos existentes')
+                               help='Overwrite existing documents')
     
-    # Comando: list-docs
-    list_parser = subparsers.add_parser('list-docs', help='Listar documentos disponibles')
+    # Command: list-docs
+    list_parser = subparsers.add_parser('list-docs', help='List available documents')
     
-    # Comando: clean
-    clean_parser = subparsers.add_parser('clean', help='Limpiar índice y empezar de nuevo')
+    # Command: clean
+    clean_parser = subparsers.add_parser('clean', help='Clean index and start over')
     
     return parser.parse_args()
 
 def check_status():
-    """Ver estado del sistema RAG"""
-    print("📊 Estado del sistema RAG (FAISS):")
+    """View RAG system status"""
+    print("📊 RAG system status (FAISS):")
     
-    # Verificar directorios
+    # Check directories
     docs_dir = Path("src/data/documents")
     index_dir = Path("src/data/faiss_index")
     
-    print(f"  📁 Directorio documentos: {'✅ Existe' if docs_dir.exists() else '❌ No existe'}")
-    print(f"  📁 Directorio índice FAISS: {'✅ Existe' if index_dir.exists() else '❌ No existe'}")
+    print(f"  📁 Documents directory: {'✅ Exists' if docs_dir.exists() else '❌ Does not exist'}")
+    print(f"  📁 FAISS index directory: {'✅ Exists' if index_dir.exists() else '❌ Does not exist'}")
     
-    # Contar documentos
+    # Count documents
     if docs_dir.exists():
         files = list(docs_dir.glob("**/*.md")) + list(docs_dir.glob("**/*.txt"))
-        print(f"  📄 Documentos disponibles: {len(files)}")
+        print(f"  📄 Available documents: {len(files)}")
         
         if files:
-            print("     Archivos encontrados:")
-            for f in files[:5]:  # Mostrar solo los primeros 5
+            print("     Files found:")
+            for f in files[:5]:  # Show only first 5
                 print(f"     - {f.name}")
             if len(files) > 5:
-                print(f"     ... y {len(files) - 5} más")
+                print(f"     ... and {len(files) - 5} more")
     else:
-        print("  📄 Documentos disponibles: 0 (directorio no existe)")
+        print("  📄 Available documents: 0 (directory does not exist)")
     
-    # Verificar índice FAISS
+    # Check FAISS index
     index_path = index_dir / "index.faiss"
     docs_path = index_dir / "documents.pkl"
     
@@ -95,165 +95,165 @@ def check_status():
             import faiss
             import pickle
             
-            # Cargar índice
+            # Load index
             index = faiss.read_index(str(index_path))
             
-            # Cargar documentos
+            # Load documents
             with open(docs_path, 'rb') as f:
                 documents = pickle.load(f)
             
-            print(f"  🗂️ Índice FAISS: ✅ {index.ntotal} chunks indexados")
-            print(f"  📐 Dimensión embeddings: {index.d}")
-            print(f"  📚 Documentos en memoria: {len(documents)}")
+            print(f"  🗂️ FAISS Index: ✅ {index.ntotal} chunks indexed")
+            print(f"  📐 Embedding dimension: {index.d}")
+            print(f"  📚 Documents in memory: {len(documents)}")
             
         except Exception as e:
-            print(f"  🗂️ Índice FAISS: ❌ Error leyendo índice: {e}")
+            print(f"  🗂️ FAISS Index: ❌ Error reading index: {e}")
     else:
-        print("  🗂️ Índice FAISS: ❌ No existe")
+        print("  🗂️ FAISS Index: ❌ Does not exist")
     
-    # Verificar dependencias
+    # Check dependencies
     try:
         import faiss
-        print(f"  📦 FAISS: ✅ Disponible")
+        print(f"  📦 FAISS: ✅ Available")
     except ImportError:
-        print("  📦 FAISS: ❌ No instalado")
+        print("  📦 FAISS: ❌ Not installed")
     
     try:
         from sentence_transformers import SentenceTransformer
-        print(f"  🧠 SentenceTransformers: ✅ Disponible")
+        print(f"  🧠 SentenceTransformers: ✅ Available")
     except ImportError:
-        print("  🧠 SentenceTransformers: ❌ No instalado")
+        print("  🧠 SentenceTransformers: ❌ Not installed")
     
-    # Verificar API key
+    # Check API key
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
-        print(f"  🔑 GROQ_API_KEY: ✅ Configurada (...{groq_key[-4:]})")
+        print(f"  🔑 GROQ_API_KEY: ✅ Configured (...{groq_key[-4:]})")
     else:
-        print("  🔑 GROQ_API_KEY: ❌ No configurada")
+        print("  🔑 GROQ_API_KEY: ❌ Not configured")
 
 def create_example_documents(overwrite: bool = False):
-    """Crea documentos de ejemplo para el sistema RAG"""
+    """Creates example documents for RAG system"""
     
     documents_dir = Path("src/data/documents")
     documents_dir.mkdir(parents=True, exist_ok=True)
     
-    # Documentos de ejemplo optimizados para FAISS
+    # Example documents optimized for FAISS (English content)
     examples = {
-        "respiracion_tecnicas.md": """# Técnicas de Respiración para la Ansiedad
+        "breathing_techniques.md": """# Breathing Techniques for Anxiety
 
-## Respiración 4-7-8 (Técnica del Dr. Weil)
+## 4-7-8 Breathing (Dr. Weil's Technique)
 
-### Pasos:
-1. **Inhala** por la nariz contando hasta 4
-2. **Mantén** la respiración contando hasta 7
-3. **Exhala** por la boca contando hasta 8
-4. **Repite** el ciclo 3-4 veces
+### Steps:
+1. **Inhale** through your nose counting to 4
+2. **Hold** your breath counting to 7
+3. **Exhale** through your mouth counting to 8
+4. **Repeat** the cycle 3-4 times
 
-### Beneficios:
-- Activa el sistema nervioso parasimpático
-- Reduce la ansiedad inmediatamente
-- Ayuda a conciliar el sueño
+### Benefits:
+- Activates the parasympathetic nervous system
+- Reduces anxiety immediately
+- Helps with falling asleep
 
-## Respiración Diafragmática
+## Diaphragmatic Breathing
 
-### Técnica:
-1. Siéntate cómodamente o acuéstate
-2. Coloca una mano en el pecho, otra en el abdomen
-3. Inhala lentamente por la nariz (el abdomen debe subir)
-4. Exhala por la boca (el abdomen baja)
-5. Practica 5-10 minutos diarios
+### Technique:
+1. Sit comfortably or lie down
+2. Place one hand on your chest, another on your abdomen
+3. Breathe slowly through your nose (abdomen should rise)
+4. Exhale through your mouth (abdomen lowers)
+5. Practice 5-10 minutes daily
 
-### Para qué sirve:
-- Reduce el estrés crónico
-- Mejora la concentración
-- Fortalece el diafragma
+### What it's for:
+- Reduces chronic stress
+- Improves concentration
+- Strengthens the diaphragm
 """,
 
-        "manejo_estres_tecnicas.md": """# Técnicas para el Manejo del Estrés
+        "stress_management_techniques.md": """# Stress Management Techniques
 
-## Técnica STOP
+## STOP Technique
 
-### Los 4 pasos:
-- **S**top: Para lo que estás haciendo
-- **T**ake a breath: Respira profundamente
-- **O**bserve: Observa qué está pasando en tu mente y cuerpo
-- **P**roceed: Continúa con intención y consciencia
+### The 4 steps:
+- **S**top: Stop what you're doing
+- **T**ake a breath: Breathe deeply
+- **O**bserve: Notice what's happening in your mind and body
+- **P**roceed: Continue with intention and awareness
 
-### Cuándo usarla:
-- Momentos de estrés agudo
-- Antes de reaccionar impulsivamente
-- Cuando sientes tensión acumulada
+### When to use it:
+- Moments of acute stress
+- Before reacting impulsively
+- When you feel accumulated tension
 
-## Técnica de Grounding 5-4-3-2-1
+## 5-4-3-2-1 Grounding Technique
 
-### Para la ansiedad inmediata:
-- **5** cosas que puedes ver
-- **4** cosas que puedes tocar
-- **3** cosas que puedes escuchar
-- **2** cosas que puedes oler
-- **1** cosa que puedes saborear
+### For immediate anxiety:
+- **5** things you can see
+- **4** things you can touch
+- **3** things you can hear
+- **2** things you can smell
+- **1** thing you can taste
 
-### Propósito:
-Reconectar con el presente y salir de pensamientos ansiosos.
+### Purpose:
+Reconnect with the present and exit anxious thoughts.
 
-## Mindfulness Express (3 minutos)
+## Express Mindfulness (3 minutes)
 
-### Pasos rápidos:
-1. **Minuto 1**: Enfócate en tu respiración
-2. **Minuto 2**: Observa las sensaciones corporales
-3. **Minuto 3**: Amplía la conciencia al entorno
+### Quick steps:
+1. **Minute 1**: Focus on your breathing
+2. **Minute 2**: Notice body sensations
+3. **Minute 3**: Expand awareness to surroundings
 
-Ideal para descansos en el trabajo o momentos de tensión.
+Perfect for work breaks or moments of tension.
 """,
 
-        "autoestima_ejercicios.md": """# Ejercicios para Fortalecer la Autoestima
+        "self_esteem_exercises.md": """# Self-Esteem Strengthening Exercises
 
-## Diario de Gratitud
+## Gratitude Journal
 
-### Práctica diaria:
-- Escribe **3 cosas** por las que te sientes agradecido
-- Incluye **1 logro** personal del día (por pequeño que sea)
-- Anota **1 cualidad** tuya que aprecias
+### Daily practice:
+- Write **3 things** you're grateful for
+- Include **1 personal achievement** from the day (however small)
+- Note **1 quality** of yours that you appreciate
 
-### Beneficios:
-- Cambia el enfoque hacia lo positivo
-- Incrementa la consciencia de fortalezas
-- Mejora el estado de ánimo
+### Benefits:
+- Shifts focus to the positive
+- Increases awareness of strengths
+- Improves mood
 
-## Técnica del Mejor Amigo
+## Best Friend Technique
 
-### Cuando tengas autocrítica:
-1. **Pregúntate**: "¿Qué le diría a mi mejor amigo en esta situación?"
-2. **Respóndete** con la misma compasión
-3. **Aplica** ese consejo a ti mismo
+### When you have self-criticism:
+1. **Ask yourself**: "What would I tell my best friend in this situation?"
+2. **Respond** with the same compassion
+3. **Apply** that advice to yourself
 
-### Para qué sirve:
-- Reduce la autocrítica destructiva
-- Desarrolla autocompasión
-- Cambia el diálogo interno
+### What it's for:
+- Reduces destructive self-criticism
+- Develops self-compassion
+- Changes internal dialogue
 
-## Afirmaciones Realistas
+## Realistic Affirmations
 
-### Ejemplos efectivos:
-- "Estoy aprendiendo y creciendo cada día"
-- "Merezco respeto y amor"
-- "Mis errores son oportunidades de aprendizaje"
-- "Tengo fortalezas únicas que aporto al mundo"
+### Effective examples:
+- "I am learning and growing every day"
+- "I deserve respect and love"
+- "My mistakes are learning opportunities"
+- "I have unique strengths that I bring to the world"
 
-### Cómo usarlas:
-- Repite cada mañana
-- Personaliza según tus necesidades
-- Mantenlas realistas y creíbles
+### How to use them:
+- Repeat every morning
+- Personalize according to your needs
+- Keep them realistic and believable
 
-## Ejercicio de Fortalezas
+## Strengths Exercise
 
-### Pasos:
-1. **Lista** 10 fortalezas personales
-2. **Identifica** cómo las usas en tu vida diaria
-3. **Planifica** cómo desarrollar más cada una
-4. **Celebra** cuando las uses conscientemente
+### Steps:
+1. **List** 10 personal strengths
+2. **Identify** how you use them in daily life
+3. **Plan** how to develop each one further
+4. **Celebrate** when you use them consciously
 
-Esto construye una base sólida de autoconocimiento positivo.
+This builds a solid foundation of positive self-knowledge.
 """,
     }
     
@@ -263,26 +263,26 @@ Esto construye una base sólida de autoconocimiento positivo.
         file_path = documents_dir / filename
         
         if file_path.exists() and not overwrite:
-            print(f"⚠️  {filename} ya existe. Usa --overwrite para sobrescribir.")
+            print(f"⚠️  {filename} already exists. Use --overwrite to overwrite.")
             continue
         
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"✅ Creado: {filename}")
+            print(f"✅ Created: {filename}")
             created_count += 1
         except Exception as e:
-            print(f"❌ Error creando {filename}: {e}")
+            print(f"❌ Error creating {filename}: {e}")
     
-    print(f"\n📝 Documentos creados: {created_count}")
+    print(f"\n📝 Documents created: {created_count}")
     return created_count > 0
 
 def main():
-    """Función principal"""
+    """Main function"""
     args = parse_args()
     
     if not args.command:
-        print("❌ Debes especificar un comando. Usa --help para ver las opciones.")
+        print("❌ You must specify a command. Use --help to see options.")
         return 1
     
     try:
@@ -291,48 +291,48 @@ def main():
             return 0
         
         elif args.command == 'create-examples':
-            print("📚 Creando documentos de ejemplo...")
+            print("📚 Creating example documents...")
             success = create_example_documents(args.overwrite)
             if success:
-                print("\n💡 Ahora puedes indexar con: python manage_rag.py index")
+                print("\n💡 Now you can index with: python manage_rag.py index")
             return 0 if success else 1
         
         elif args.command == 'list-docs':
-            print("📋 Documentos disponibles:")
+            print("📋 Available documents:")
             docs_dir = Path("src/data/documents")
             if not docs_dir.exists():
-                print("❌ Directorio de documentos no existe")
+                print("❌ Documents directory does not exist")
                 return 1
             
             files = list(docs_dir.rglob("*"))
             files = [f for f in files if f.is_file() and f.suffix in ['.md', '.txt']]
             
             if not files:
-                print("📂 No hay documentos disponibles")
-                print("💡 Crea algunos con: python manage_rag.py create-examples")
+                print("📂 No documents available")
+                print("💡 Create some with: python manage_rag.py create-examples")
                 return 0
             
             for file in files:
                 size = file.stat().st_size
                 print(f"  - {file.name} ({size} bytes)")
             
-            print(f"\nTotal: {len(files)} archivos")
+            print(f"\nTotal: {len(files)} files")
             return 0
         
         elif args.command == 'clean':
-            print("🧹 Limpiando índice FAISS...")
+            print("🧹 Cleaning FAISS index...")
             index_dir = Path("src/data/faiss_index")
             if index_dir.exists():
                 import shutil
                 shutil.rmtree(index_dir)
-                print("✅ Índice FAISS eliminado")
+                print("✅ FAISS index deleted")
             else:
-                print("⚠️ No había índice que limpiar")
+                print("⚠️ No index to clean")
             return 0
         
-        # Para otros comandos que requieren RAG
+        # For other commands that require RAG
         elif args.command in ['index', 'search', 'add']:
-            print("🔄 Inicializando sistema RAG con FAISS...")
+            print("🔄 Initializing RAG system with FAISS...")
             
             from src.utils.rag_manager import initialize_rag_manager
             
@@ -341,24 +341,24 @@ def main():
             )
             
             if not rag_manager:
-                print("❌ No se pudo inicializar RAG Manager")
-                print("💡 Verifica que tengas FAISS instalado: pip install faiss-cpu")
+                print("❌ Could not initialize RAG Manager")
+                print("💡 Check that you have FAISS installed: pip install faiss-cpu")
                 return 1
             
-            # Ejecutar comando específico
+            # Execute specific command
             if args.command == 'index':
-                print("📚 Indexando documentos...")
+                print("📚 Indexing documents...")
                 success = rag_manager.index_documents()
                 if success:
-                    print("✅ Documentos indexados correctamente")
+                    print("✅ Documents indexed correctly")
                     stats = rag_manager.get_stats()
-                    print(f"📊 Documentos en el índice: {stats.get('documents_indexed', 'Desconocido')}")
+                    print(f"📊 Documents in index: {stats.get('documents_indexed', 'Unknown')}")
                 else:
-                    print("❌ Error al indexar documentos")
+                    print("❌ Error indexing documents")
                     return 1
             
             elif args.command == 'search':
-                print(f"🔍 Buscando: '{args.query}' (Categoría: {args.category})")
+                print(f"🔍 Searching: '{args.query}' (Category: {args.category})")
                 results = rag_manager.search_relevant_content(
                     args.query, 
                     k=args.k,
@@ -366,37 +366,37 @@ def main():
                 )
                 
                 if not results:
-                    print("📭 No se encontraron resultados relevantes")
+                    print("📭 No relevant results found")
                     return 0
                 
-                print(f"\n📋 Encontrados {len(results)} resultados:")
+                print(f"\n📋 Found {len(results)} results:")
                 for i, result in enumerate(results, 1):
-                    print(f"\n--- Resultado {i} ---")
-                    print(f"Fuente: {result['source']}")
-                    print(f"Puntuación: {result['relevance_score']:.3f}")
-                    print(f"Contenido: {result['content'][:200]}...")
+                    print(f"\n--- Result {i} ---")
+                    print(f"Source: {result['source']}")
+                    print(f"Score: {result['relevance_score']:.3f}")
+                    print(f"Content: {result['content'][:200]}...")
                     if len(result['content']) > 200:
                         print("  [...]")
             
             elif args.command == 'add':
-                print(f"📝 Añadiendo documento: '{args.text[:50]}...'")
+                print(f"📝 Adding document: '{args.text[:50]}...'")
                 metadata = {
-                    'title': args.title or 'Documento añadido manualmente',
+                    'title': args.title or 'Manually added document',
                     'category': args.category,
                     'source': 'manual_input'
                 }
                 
                 success = rag_manager.add_document_from_text(args.text, metadata)
                 if success:
-                    print("✅ Documento añadido correctamente")
+                    print("✅ Document added correctly")
                 else:
-                    print("❌ Error al añadir documento")
+                    print("❌ Error adding document")
                     return 1
         
         return 0
         
     except KeyboardInterrupt:
-        print("\n⏹️ Proceso cancelado por el usuario")
+        print("\n⏹️ Process cancelled by user")
         return 0
     except Exception as e:
         print(f"❌ Error: {e}")

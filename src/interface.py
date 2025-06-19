@@ -1,5 +1,5 @@
 """
-Interfaz de usuario mejorada con tonos naranja suaves para el asistente de salud mental
+User interface
 """
 
 import os
@@ -9,16 +9,15 @@ from typing import Dict, Any, List, Tuple, Union
 import traceback
 import time
 
-# Añadir el directorio raíz al path para importaciones relativas
+# Add root directory to path for relative imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils.groq_client import GroqClient
 from src.config.settings import MENTAL_HEALTH_CATEGORIES, RESOURCES, GROQ_MODELS
 from src.utils.safety import detect_crisis, get_crisis_response
 
-# CSS personalizado simplificado para mejor compatibilidad móvil
+# Custom CSS
 custom_css = """
-/* Variables CSS para tonos naranja suaves */
 :root {
     --primary-orange: #ff7b42;      
     --light-orange: #FF8F39;        
@@ -27,13 +26,11 @@ custom_css = """
     --warm-white: #FFF8F3;          
 }
 
-/* Estilo general del contenedor */
 .gradio-container {
     background: linear-gradient(135deg, var(--warm-white) 0%, var(--very-light-orange) 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Encabezado principal */
 .main-header {
     background: linear-gradient(90deg, var(--primary-orange) 0%, var(--light-orange) 100%);
     color: white;
@@ -43,7 +40,6 @@ custom_css = """
     box-shadow: 0 4px 15px rgba(255, 140, 66, 0.2);
 }
 
-/* Botones de Gradio simplificados */
 .gr-button {
     border-radius: 8px !important;
     font-weight: 500 !important;
@@ -61,7 +57,6 @@ custom_css = """
     color: #333 !important;
 }
 
-/* Input de texto */
 .gr-textbox {
     border: 2px solid var(--orange-accent) !important;
     border-radius: 8px !important;
@@ -71,7 +66,6 @@ custom_css = """
     border-color: var(--primary-orange) !important;
 }
 
-/* Radio buttons simplificados */
 .gr-radio label {
     background: white !important;
     border: 2px solid var(--orange-accent) !important;
@@ -86,7 +80,6 @@ custom_css = """
     border-color: var(--primary-orange) !important;
 }
 
-/* Responsive design mejorado */
 @media (max-width: 768px) {
     .gradio-container {
         padding: 10px;
@@ -115,63 +108,62 @@ custom_css = """
 
 def create_mental_health_interface():
     """
-    Crea la interfaz de usuario mejorada para el asistente de salud mental usando GroqCloud
+    Creates the user interface
     
     Returns:
-        Objeto Gradio para lanzar la interfaz
+        Gradio object to launch the interface
     """
     
-    # Crear cliente de GroqCloud
+    # Create GroqCloud client
     try:
         client = GroqClient()
         available_models = client.get_available_models()
-        print(f"✅ Modelos disponibles: {available_models}")
     except Exception as e:
-        print(f"⚠️ Error al inicializar el cliente de GroqCloud: {e}")
+        print(f"⚠️ Error initializing GroqCloud client: {e}")
         available_models = list(GROQ_MODELS.keys()) if GROQ_MODELS else ["meta-llama/llama-4-scout-17b-16e-instruct"]
     
-    # Ejemplos de preguntas por categoría
+    # Example questions by category
     examples = {
         "General": [
-            "¿Podrías darme algunos consejos para mejorar mi bienestar emocional?",
-            "¿Qué hábitos diarios son buenos para la salud mental?",
-            "¿Cómo puedo saber si necesito ayuda profesional?"
+            "Could you give me some tips to improve my emotional well-being?",
+            "What daily habits are good for mental health?",
+            "How can I know if I need professional help?"
         ],
-        "Ansiedad": [
-            "Últimamente me siento ansioso. ¿Podrías ayudarme?",
-            "¿Cómo puedo manejar los ataques de pánico?",
-            "¿Qué técnicas de respiración son buenas para la ansiedad?"
+        "Anxiety": [
+            "I've been feeling anxious lately. Could you help me?",
+            "How can I manage panic attacks?",
+            "What breathing techniques are good for anxiety?"
         ],
-        "Depresión": [
-            "He estado sintiéndome sin energía y con poco interés en las cosas",
-            "¿Cómo puedo lidiar con pensamientos negativos recurrentes?",
-            "Me cuesta levantarme por las mañanas. ¿Qué puedo hacer?"
+        "Depression": [
+            "I've been feeling without energy and with little interest in things",
+            "How can I deal with recurring negative thoughts?",
+            "I have trouble getting up in the mornings. What can I do?"
         ],
-        "Estrés": [
-            "El trabajo me está causando mucho estrés, ¿cómo puedo manejarlo?",
-            "Necesito técnicas para relajarme después de un día difícil",
-            "¿Qué ejercicios rápidos me ayudarían a reducir el estrés?"
+        "Stress": [
+            "Work is causing me a lot of stress, how can I manage it?",
+            "I need techniques to relax after a difficult day",
+            "What quick exercises would help me reduce stress?"
         ],
-        "Relaciones": [
-            "Tengo problemas para comunicarme con mi pareja",
-            "¿Cómo puedo establecer límites saludables con mi familia?",
-            "Me cuesta confiar en los demás después de una mala experiencia"
+        "Relationships": [
+            "I have problems communicating with my partner",
+            "How can I establish healthy boundaries with my family?",
+            "I have trouble trusting others after a bad experience"
         ],
-        "Autoestima": [
-            "Siempre me comparo con los demás y me siento inferior",
-            "¿Cómo puedo mejorar mi autoimagen?",
-            "¿Qué ejercicios puedo hacer para fortalecer mi autoestima?"
+        "Self-esteem": [
+            "I always compare myself to others and feel inferior",
+            "How can I improve my self-image?",
+            "What exercises can I do to strengthen my self-esteem?"
         ],
-        "Técnicas de relajación": [
-            "Me gustaría aprender técnicas para relajarme",
-            "¿Puedes guiarme en una meditación corta?",
-            "¿Qué es la relajación muscular progresiva y cómo se practica?"
+        "Relaxation techniques": [
+            "I would like to learn techniques to relax",
+            "Can you guide me through a short meditation?",
+            "What is progressive muscle relaxation and how is it practiced?"
         ]
     }
     
-    # Crear interfaz con Gradio usando CSS personalizado
+    # Create interface with Gradio using custom CSS
     with gr.Blocks(
-        title="🧠 Asistente de Salud Mental", 
+        title="🧠 Mental Health Assistant", 
         css=custom_css,
         theme=gr.themes.Soft(
             primary_hue="orange",
@@ -180,38 +172,40 @@ def create_mental_health_interface():
         )
     ) as demo:
         
-        # Header y disclaimer combinados SIN espacio
+        # Header and disclaimer
         gr.HTML("""
-        <div class="main-header fade-in" style="text-align: center; margin-bottom: 20px;">
-            <h1 style="margin: 8px; font-size: 2.5em; font-weight: 900;">
-                🧠 Asistente Virtual de Salud Mental
-            </h1>
-        </div>
-        <div style="background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A6 100%); 
+        <div style="max-width: 2000px; margin: 0 auto; width: 100%;">
+            <div class="main-header fade-in" style="text-align: center; margin-bottom: 10px;">
+                <h1 style="margin: 10px; font-size: 2.5em; font-weight: 1000;">
+                   🧠 Virtual Mental Health Assistant
+                </h1>
+            </div>
+            <div style="background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A6 100%); 
                     border-left: 4px solid #FF8C42; 
                     padding: 15px; 
                     border-radius: 8px; 
                     margin: 0 0 15px 0;
                     box-shadow: 0 2px 8px rgba(255, 140, 66, 0.1);">
-            <p style="margin: 0; color: #5D4E37; font-weight: 500;">
-                ⚠️ <strong>Importante:</strong> Este asistente proporciona apoyo emocional y psicoeducación, 
-                pero no reemplaza la atención profesional. 
-                Si experimentas una crisis, contacta inmediatamente:
-            </p>
-            <ul style="margin: 8px 0 0 20px; color: #5D4E37;">
-                <li><strong>Emergencias:</strong> 112 </li>
-                <li><strong>Línea de Prevención del Suicidio:</strong> 024</li>
-            </ul>
+                <p style="margin: 0; color: #5D4E37; font-weight: 500;">
+                   ⚠️ <strong>Important:</strong> This assistant provides emotional support and psychoeducation, 
+                   but does not replace professional care. 
+                   If you experience a crisis, contact immediately:
+                </p>
+                <ul style="margin: 8px 0 0 20px; color: #5D4E37;">
+                    <li><strong>Emergencies:</strong> 112 </li>
+                    <li><strong>Suicide Prevention Line:</strong> 024</li>
+                </ul>
+            </div>
         </div>
         """)
         
-        # Selectores con diseño mejorado
+        # Selectors
         with gr.Row():
             with gr.Column(scale=2):
                 topic = gr.Radio(
                     MENTAL_HEALTH_CATEGORIES,
-                    label="🎯 Selecciona tu tema de interés",
-                    info="Esto personaliza las respuestas según tus necesidades",
+                    label="🎯 Select your topic of interest",
+                    info="This personalizes responses according to your needs",
                     value="General",
                     elem_classes="radio-group"
                 )
@@ -219,130 +213,132 @@ def create_mental_health_interface():
             with gr.Column(scale=1):
                 model_selector = gr.Dropdown(
                     available_models,
-                    label="🤖 Modelo de IA",
-                    info="Modelos más grandes ofrecen respuestas más elaboradas",
+                    label="🤖 AI Model",
+                    info="Larger models offer more elaborate responses",
                     value=available_models[0] if available_models else None,
                     elem_classes="dropdown-container"
                 )
         
-        # Status box (oculto por defecto)
-        status_box = gr.Textbox(label="Estado", visible=False)
+        # Status box
+        status_box = gr.Textbox(label="Status", visible=False)
         
-        # Área de chat con estilo mejorado
+        # Chat area
         with gr.Row():
             chatbot = gr.Chatbot(
-                height=700, 
+                height=500, 
                 show_label=False,
                 elem_classes="chat-container",
-                avatar_images=(None,None)
+                avatar_images=(None,None),
+                type="messages"  # Fix Gradio warning
             )
         
-        # Input y botón de envío
+        # Input and send button
         with gr.Row():
             with gr.Column(scale=8):
                 msg = gr.Textbox(
-                    label="💬 Escribe tu mensaje aquí", 
-                    placeholder="¿Cómo puedo ayudarte hoy? Siéntete libre de compartir lo que tienes en mente...",
+                    label="💬 Write your message here", 
+                    placeholder="How can I help you today? Feel free to share what's on your mind...",
                     show_label=False,
                     elem_classes="message-input"
                 )
             
             with gr.Column(scale=1):
                 submit_btn = gr.Button(
-                    "Enviar 📤", 
+                    "Send 📤", 
                     variant="primary",
                     elem_classes="primary-button"
                 )
         
-        # Botones de acción con estilo mejorado
+        # Action buttons
         with gr.Row():
             clear_btn = gr.Button(
-                "🔄 Nueva conversación", 
+                "🔄 New conversation", 
                 elem_classes="secondary-button"
             )
             example_btn = gr.Button(
-                "💡 Ver ejemplos", 
+                "💡 View examples", 
                 elem_classes="secondary-button"
             )
         
-        # Ejemplos de preguntas
-        with gr.Accordion("💡 Ejemplos de preguntas", open=False, visible=False) as example_container:
+        # Question examples
+        with gr.Accordion("💡 Example questions", open=False, visible=False) as example_container:
             
             with gr.Row():
                 example_btns = []
                 for i in range(3):
                     btn = gr.Button(
-                        "Ejemplo", 
+                        "Example", 
                         visible=True,
                         elem_classes="secondary-button"
                     )
                     example_btns.append(btn)
         
-        # Variable para controlar visibilidad
-        show_examples = gr.Checkbox(label="Mostrar ejemplos", value=False, visible=False)
+        # Variable to control visibility
+        show_examples = gr.Checkbox(label="Show examples", value=False, visible=False)
         
-        # Recursos con diseño mejorado
-        with gr.Accordion("📚 Recursos adicionales", open=False, elem_classes="accordion"):
+        # Resources
+        with gr.Accordion("📚 Additional resources", open=False, elem_classes="accordion"):
             resources_md = gr.Markdown("""
-            ### 🌟 Recursos Generales
-            - [🌍 OMS - Salud Mental](https://www.who.int/es/health-topics/mental-health)
+            ### 🌟 General Resources
+            - [🌍 WHO - Mental Health](https://www.who.int/es/health-topics/mental-health)
             - [📞 Teléfono de la Esperanza](https://telefonodelaesperanza.org/)
-            - [🤝 Confederación Salud Mental España](https://consaludmental.org/)
+            - [🤝 Spanish Mental Health Confederation](https://consaludmental.org/)
             """)
         
-        # Configuración avanzada con mejor diseño
-        with gr.Accordion("⚙️ Configuración avanzada", open=False, elem_classes="accordion"):
+        # Advanced configuration
+        with gr.Accordion("⚙️ Advanced configuration", open=False, elem_classes="accordion"):
             with gr.Row():
                 temperature = gr.Slider(
                     0.1, 1.5, 0.7, 
-                    label="🌡️ Creatividad (Temperatura)", 
-                    info="Valores más altos = respuestas más creativas",
+                    label="🌡️ Creativity (Temperature)", 
+                    info="Higher values = more creative responses",
                     elem_classes="slider-container"
                 )
                 max_tokens = gr.Slider(
                     64, 4096, 512, 
-                    label="📏 Longitud máxima", 
+                    label="📏 Maximum length", 
                     step=64,
-                    info="Máximo de palabras en la respuesta",
+                    info="Maximum words in the response",
                     elem_classes="slider-container"
                 )
                 timeout = gr.Slider(
                     5, 120, 60,
-                    label="⏱️ Tiempo máximo (segundos)",
-                    info="Tiempo máximo para generar respuesta",
+                    label="⏱️ Maximum time (seconds)",
+                    info="Maximum time to generate response",
                     elem_classes="slider-container"
                 )
         
-        # Estado para almacenar datos entre interacciones
+        # State to store data between interactions
         state = gr.State({"category": "General", "history": []})
         
-        # [Aquí van todas las funciones del código original sin cambios]
-        # Función para procesar mensajes
+        # Function to process messages
         def process_message(message, history, state_data, model, temp, tokens, max_timeout):
-            """Procesa el mensaje del usuario y genera una respuesta usando GroqCloud"""
+            """Processes user message and generates response using GroqCloud"""
             if not message.strip():
                 return "", history, state_data, gr.update(visible=False, value="")
             
-            # Actualizar historial en el estado
+            # Update history in state
             if "history" not in state_data:
                 state_data["history"] = []
                 
             state_data["history"].append({"role": "user", "content": message})
             
-            # Detectar palabras clave de crisis
+            # Detect crisis keywords
             crisis_detected, keywords = detect_crisis(message)
             if crisis_detected:
                 crisis_response = get_crisis_response(keywords)
-                history.append((message, crisis_response))
+                history.append({"role": "user", "content": message})
+                history.append({"role": "assistant", "content": crisis_response})
                 state_data["history"].append({"role": "assistant", "content": crisis_response})
                 return "", history, state_data, gr.update(visible=False, value="")
             
-            # Obtener categoría
+            # Get category
             category = state_data.get("category", "General")
             
             try:
                 groq = GroqClient()
-                history.append((message, "🤔 Pensando..."))
+                history.append({"role": "user", "content": message})
+                history.append({"role": "assistant", "content": "🤔 Thinking..."})
                 
                 start_time = time.time()
                 
@@ -355,93 +351,94 @@ def create_mental_health_interface():
                         max_tokens=int(tokens)
                     )
                     
-                    history[-1] = (message, response)
+                    history[-1] = {"role": "assistant", "content": response}
                     state_data["history"].append({"role": "assistant", "content": response})
                     
                     return "", history, state_data, gr.update(visible=False, value="")
                     
                 except Exception as e:
-                    print(f"❌ Error al generar respuesta: {e}")
+                    print(f"❌ Error generating response: {e}")
                     print(traceback.format_exc())
                     
-                    error_message = "Lo siento, ha ocurrido un error al procesar tu solicitud. Por favor, inténtalo de nuevo."
-                    history[-1] = (message, error_message)
+                    error_message = "I'm sorry, an error occurred while processing your request. Please try again."
+                    history[-1] = {"role": "assistant", "content": error_message}
                     
                     return "", history, state_data, gr.update(visible=True, value=f"Error: {str(e)}")
                 
             except Exception as e:
-                print(f"❌ Error al crear cliente o procesar mensaje: {e}")
+                print(f"❌ Error creating client or processing message: {e}")
                 print(traceback.format_exc())
                 
-                error_message = "Lo siento, ha ocurrido un error al procesar tu solicitud. Por favor, inténtalo de nuevo."
-                history.append((message, error_message))
+                error_message = "I'm sorry, an error occurred while processing your request. Please try again."
+                history.append({"role": "user", "content": message})
+                history.append({"role": "assistant", "content": error_message})
                 
                 return "", history, state_data, gr.update(visible=True, value=f"Error: {str(e)}")
         
-        # Función para actualizar la categoría
+        # Function to update category
         def update_category(category, state_data):
-            """Actualiza la categoría en el estado"""
+            """Updates category in state"""
             state_data["category"] = category
             
             try:
                 if isinstance(RESOURCES, dict) and category in RESOURCES:
                     category_resources = RESOURCES[category]
-                    resources_text = f"### 🌟 Recursos para {category}\n"
+                    resources_text = f"### 🌟 Resources for {category}\n"
                     for resource in category_resources:
                         resources_text += f"- [📖 {resource['name']}]({resource['url']})\n"
                     
                     if category != "General" and "General" in RESOURCES:
-                        resources_text += f"\n### 🌍 Recursos Generales\n"
+                        resources_text += f"\n### 🌍 General Resources\n"
                         for resource in RESOURCES["General"]:
                             resources_text += f"- [📖 {resource['name']}]({resource['url']})\n"
                 else:
-                    resources_text = "### ⚠️ No hay recursos disponibles para esta categoría"
+                    resources_text = "### ⚠️ No resources available for this category"
             except Exception as e:
-                print(f"Error al actualizar recursos: {e}")
-                resources_text = "### ❌ Error al cargar recursos"
+                print(f"Error updating resources: {e}")
+                resources_text = "### ❌ Error loading resources"
                 
             return state_data, resources_text
         
-        # Función para actualizar la sugerencia de prompt
+        # Function to update prompt suggestion
         def update_prompt_suggestion(category):
-            """Devuelve una sugerencia de mensaje basada en la categoría"""
+            """Returns a message suggestion based on category"""
             prompts = {
-                "General": "Hola, me gustaría conversar contigo sobre mi bienestar emocional.",
-                "Ansiedad": "Últimamente me siento ansioso y necesito ayuda para manejarlo.",
-                "Depresión": "He estado sintiéndome sin energía y con poco interés en las cosas.",
-                "Estrés": "El estrés me está afectando mucho últimamente.",
-                "Relaciones": "Estoy teniendo dificultades en mis relaciones personales.",
-                "Autoestima": "He notado que tengo pensamientos muy negativos sobre mí mismo.",
-                "Técnicas de relajación": "Me gustaría aprender algunas técnicas para relajarme."
+                "General": "Hello, I would like to talk to you about my emotional well-being.",
+                "Anxiety": "I've been feeling anxious lately and need help managing it.",
+                "Depression": "I've been feeling without energy and with little interest in things.",
+                "Stress": "Stress is affecting me a lot lately.",
+                "Relationships": "I'm having difficulties in my personal relationships.",
+                "Self-esteem": "I've noticed that I have very negative thoughts about myself.",
+                "Relaxation techniques": "I would like to learn some techniques to relax."
             }
             
-            return prompts.get(category, f"Me gustaría hablar sobre {category.lower()}.")
+            return prompts.get(category, f"I would like to talk about {category.lower()}.")
         
-        # Función para limpiar la conversación
+        # Function to clear conversation
         def clear_conversation():
-            """Limpia la conversación y el estado"""
+            """Clears conversation and state"""
             return [], {"category": topic.value, "history": []}, gr.update(visible=False, value="")
         
-        # Función para alternar ejemplos
+        # Function to toggle examples
         def toggle_examples(value):
-            """Alterna la visibilidad del contenedor de ejemplos"""
+            """Toggles visibility of examples container"""
             return not show_examples.value, gr.update(visible=not show_examples.value)
         
-        # Función para actualizar ejemplos
+        # Function to update examples
         def update_examples(category):
-            """Actualiza los textos de los botones de ejemplo según la categoría"""
+            """Updates example button texts according to category"""
             category_examples = examples.get(category, examples["General"])
             while len(category_examples) < 3:
-                category_examples.append("¿Cómo puedo mejorar mi bienestar emocional?")
+                category_examples.append("How can I improve my emotional well-being?")
             
             return [category_examples[0], category_examples[1], category_examples[2]]
         
-        # Función para usar un ejemplo como mensaje
+        # Function to use an example as message
         def use_example(example_text):
-            """Establece el texto del ejemplo como mensaje"""
+            """Sets example text as message"""
             return example_text
         
-        # Conectar eventos (sin cambios en la funcionalidad)
+        # Connect events (no changes in functionality)
         submit_btn.click(
             process_message, 
             [msg, chatbot, state, model_selector, temperature, max_tokens, timeout], 
@@ -494,6 +491,6 @@ def create_mental_health_interface():
     return demo
 
 if __name__ == "__main__":
-    # Prueba de la interfaz
+    # Interface test
     demo = create_mental_health_interface()
     demo.launch(server_name="0.0.0.0", server_port=7860)

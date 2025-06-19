@@ -1,5 +1,5 @@
 """
-Módulo de seguridad para detectar mensajes de crisis y manejarlos adecuadamente
+Safety module to detect crisis messages and handle them appropriately
 """
 
 from typing import Tuple, List
@@ -14,107 +14,106 @@ def detect_crisis(message: str) -> Tuple[bool, List[str]]:
 
 def get_crisis_response(keywords: List[str]) -> str:
     """
-    Genera una respuesta de protocolo de crisis mejorada
+    Generates a crisis protocol response
     """
     from src.config.settings import EMERGENCY_NUMBERS
     
-    # Detectar si es riesgo alto
-    high_risk_words = ["suicidio", "matarme", "quitarme la vida", "quiero morir","autolesión", "cortarme", "hacerme daño", "morir", "acabar con todo"]
+    # Detect if it's high risk
+    high_risk_words = ["suicide", "kill myself", "end my life", "want to die", "self-harm", "cut myself", "hurt myself", "die", "end it all"]
     is_high_risk = any(word in keywords for word in high_risk_words)
     
     if is_high_risk:
         response = """
-🚨 **SITUACIÓN DE CRISIS DETECTADA**
+🚨 **CRISIS SITUATION DETECTED**
 
-He detectado que podrías estar en riesgo inmediato. Es MUY IMPORTANTE que busques ayuda AHORA:
+I've detected that you might be at immediate risk. It's VERY IMPORTANT that you seek help NOW:
 
-📞 **CONTACTO INMEDIATO:**
-- Emergencias: 112
-- Línea Prevención Suicidio: 024 (24h, gratuita)
+📞 **IMMEDIATE CONTACT:**
+- Emergency Services: 112
+- Suicide Prevention Line: 024 (24/7, free)
 
-🆘 **Si estás en peligro, ve al hospital más cercano**
+🆘 **If you're in danger, go to the nearest hospital**
         """
     else:
         response = """
-**Mensaje importante de seguridad**
+**Important safety message**
 
-He detectado contenido que indica que estás pasando por un momento muy difícil.
-Es importante que sepas que hay ayuda disponible:
+I've detected content that indicates you're going through a very difficult time.
+It's important that you know help is available:
         """
     
-    # Recursos comunes para ambos casos
+    # Common resources for both cases
     response += f"""
 
-📞 **Recursos de ayuda:**
-- Emergencias: {EMERGENCY_NUMBERS['general']}
-- Línea Prevención Suicidio: {EMERGENCY_NUMBERS['suicide_prevention']} (24h)
-- Salud Mental España: {EMERGENCY_NUMBERS['mental_health']}
-- Teléfono ANAR (jóvenes): {EMERGENCY_NUMBERS['youth_phone']}
+📞 **Help resources:**
+- Emergency Services: {EMERGENCY_NUMBERS['general']}
+- Suicide Prevention Line: {EMERGENCY_NUMBERS['suicide_prevention']} (24/7)
+- Mental Health Spain: {EMERGENCY_NUMBERS['mental_health']}
+- ANAR Phone (youth): {EMERGENCY_NUMBERS['youth_phone']}
 - Online: {EMERGENCY_NUMBERS['online_chat']}
 """
     
-    if "gender_violence" in EMERGENCY_NUMBERS and any(word in keywords for word in ["violencia", "maltrato", "abusan"]):
-        response += f"• Violencia de Género: {EMERGENCY_NUMBERS['gender_violence']}\n"
+    if "gender_violence" in EMERGENCY_NUMBERS and any(word in keywords for word in ["violence", "abuse", "mistreat"]):
+        response += f"• Gender Violence: {EMERGENCY_NUMBERS['gender_violence']}\n"
     
     response += """
-Este asistente no está diseñado para manejar situaciones de crisis y no reemplaza 
-la ayuda profesional. Si estás en peligro inmediato, contacta con los servicios 
-de emergencia.
+This assistant is not designed to handle crisis situations and does not replace 
+professional help. If you are in immediate danger, contact emergency services.
 
-Tu vida tiene valor. No estás solo/a.
+Your life has value. You are not alone.
     """
     
     return response
 
 def check_message_safety(message: str) -> Tuple[bool, str]:
     """
-    Comprueba la seguridad del mensaje para detectar contenido inapropiado
+    Checks message safety to detect inappropriate content
     
     Args:
-        message: Mensaje a comprobar
+        message: Message to check
         
     Returns:
-        Tupla con (es_seguro, mensaje_de_advertencia)
+        Tuple with (is_safe, warning_message)
     """
-    # Lista de palabras que podrían indicar contenido inapropiado no relacionado con crisis
+    # List of words that might indicate inappropriate content not related to crisis
     inappropriate_keywords = [
-        "hackear", "hacker", "pornografía", "pornografia", "robar", "piratear", 
-        "crackear", "crack", "drogas ilegales", "suplantar", "identidad"
+        "hack", "hacker", "pornography", "steal", "pirate", 
+        "crack", "illegal drugs", "impersonate", "identity theft"
     ]
     
     message_lower = message.lower()
     
-    # Comprobar palabras inapropiadas
+    # Check inappropriate words
     for word in inappropriate_keywords:
         if word in message_lower:
-            return False, "Tu mensaje parece contener temas que están fuera del ámbito de este asistente de salud mental. Por favor, formula tu consulta enfocándola en temas de bienestar emocional y salud mental."
+            return False, "Your message seems to contain topics that are outside the scope of this mental health assistant. Please formulate your query focusing on emotional well-being and mental health topics."
     
-    # Si no se detectan problemas
+    # If no problems detected
     return True, ""
 
 if __name__ == "__main__":
-    # Pruebas de funcionamiento
+    # Functionality tests
     test_messages = [
-        "Hola, ¿cómo estás?",
-        "No puedo más con esta situación, quiero acabar con todo",
-        "A veces pienso que sería mejor quitarme la vida",
-        "Me siento muy triste últimamente",
-        "¿Cómo puedo hackear la cuenta de alguien?"
+        "Hello, how are you?",
+        "I can't take this situation anymore, I want to end it all",
+        "Sometimes I think it would be better to kill myself",
+        "I've been feeling very sad lately",
+        "How can I hack someone's account?"
     ]
     
     for message in test_messages:
-        print(f"\nMensaje: {message}")
+        print(f"\nMessage: {message}")
         
-        # Prueba de detección de crisis
+        # Crisis detection test
         crisis_detected, keywords = detect_crisis(message)
-        print(f"¿Crisis detectada?: {crisis_detected}")
+        print(f"Crisis detected?: {crisis_detected}")
         if crisis_detected:
-            print(f"Palabras clave: {keywords}")
-            print("Respuesta de crisis:")
+            print(f"Keywords: {keywords}")
+            print("Crisis response:")
             print(get_crisis_response(keywords))
         
-        # Prueba de seguridad general
+        # General safety test
         is_safe, warning = check_message_safety(message)
-        print(f"¿Mensaje seguro?: {is_safe}")
+        print(f"Safe message?: {is_safe}")
         if not is_safe:
-            print(f"Advertencia: {warning}")
+            print(f"Warning: {warning}")

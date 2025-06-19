@@ -1,25 +1,25 @@
-# 🧠 Asistente de Salud Mental
+# 🧠 Mental Health Assistant
 
-Asistente virtual inteligente que combina LLMs de GroqCloud con sistema RAG (FAISS) para proporcionar apoyo emocional especializado y recursos psicoeducativos.
+Intelligent virtual assistant that combines GroqCloud LLMs with RAG system (FAISS) to provide specialized emotional support and psychoeducational resources.
 
-## ✨ Características
+## ✨ Features
 
-- **🤖 Interfaz web intuitiva** con Gradio
-- **📚 Sistema RAG avanzado** con FAISS para respuestas enriquecidas
-- **🎯 7 categorías especializadas** de salud mental
-- **🚨 Detección automática de crisis** con protocolos de seguridad
-- **⚡ Múltiples modelos LLM** de GroqCloud
-- **🛠️ Scripts de gestión completos**
+- **🤖 Intuitive web interface** with Gradio
+- **📚 Advanced RAG system** with FAISS for enriched responses
+- **🎯 7 specialized categories** for mental health
+- **🚨 Automatic crisis detection** with safety protocols
+- **⚡ Multiple LLM models** from GroqCloud
+- **🛠️ Complete management scripts**
 
-## 🚀 Instalación
+## 🚀 Installation
 
-### 1. Clonar repositorio
+### 1. Clone repository
 ```bash
 git clone https://github.com/Samuromarin/Mental-Health-Assistant.git
 cd Mental-Health-Assistant
 ```
 
-### 2. Crear entorno virtual
+### 2. Create virtual environment
 ```bash
 python -m venv venv
 
@@ -30,202 +30,202 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar API de GroqCloud
-1. Ve a [console.groq.com](https://console.groq.com/) y obtén tu clave API gratuita
-2. Crea un archivo `.env` en la raíz del proyecto con tu clave:
+### 4. Configure GroqCloud API
+1. Go to [console.groq.com](https://console.groq.com/) and get your free API key
+2. Create a `.env` file in the project root with your key:
 ```
-GROQ_API_KEY=tu_clave_api_aquí
+GROQ_API_KEY=your_api_key_here
 ```
 
-### 5. Verificar configuración
+### 5. Verify configuration
 ```bash
-# Verificar que la API funciona
+# Verify API works
 python check_groq_models.py
 ```
 
-### 6. Configurar RAG (opcional pero recomendado)
+### 6. Configure RAG (optional but recommended)
 ```bash
-# Crear documentos de ejemplo
+# Create example documents
 python manage_rag.py create-examples
 
-# Indexar documentos en FAISS
+# Index documents in FAISS
 python manage_rag.py index
 
-# Verificar estado
+# Check status
 python manage_rag.py status
 ```
 
-### 7. Iniciar asistente
+### 7. Start assistant
 ```bash
 python run_groq_assistant.py
 ```
 
-¡Listo! Accede en: **http://localhost:7860**
+Ready! Access at: **http://localhost:7860**
 
-## 🎯 Categorías de Salud Mental
+## 🎯 Mental Health Categories
 
-| Categoría | Enfoque |
-|-----------|---------|
-| 🌟 **General** | Bienestar emocional general |
-| 😰 **Ansiedad** | Técnicas de respiración, manejo de crisis |
-| 😔 **Depresión** | Apoyo emocional, estrategias de afrontamiento |
-| ⚡ **Estrés** | Técnicas de relajación, mindfulness |
-| 💕 **Relaciones** | Comunicación, límites saludables |
-| 💪 **Autoestima** | Fortalecimiento personal, autocompasión |
-| 🧘 **Relajación** | Mindfulness, respiración, meditación |
+| Category | Focus |
+|----------|-------|
+| 🌟 **General** | General emotional well-being |
+| 😰 **Anxiety** | Breathing techniques, crisis management |
+| 😔 **Depression** | Emotional support, coping strategies |
+| ⚡ **Stress** | Relaxation techniques, mindfulness |
+| 💕 **Relationships** | Communication, healthy boundaries |
+| 💪 **Self-esteem** | Personal strengthening, self-compassion |
+| 🧘 **Relaxation** | Mindfulness, breathing, meditation |
 
-## 🏗️ Estructura del Proyecto
+## 🏗️ Project Structure
 
 ```
 mental-health-assistant/
-├── 🚀 run_groq_assistant.py     # Script principal
-├── 🧪 test_groq_api.py          # Pruebas API
-├── ✅ check_groq_models.py      # Verificar modelos
-├── 🔧 manage_rag.py             # Gestión RAG
-├── 📋 requirements.txt          # Dependencias
+├── 🚀 run_groq_assistant.py     # Main script
+├── 🧪 test_groq_api.py          # API tests
+├── ✅ check_groq_models.py      # Verify models
+├── 🔧 manage_rag.py             # RAG management
+├── 📋 requirements.txt          # Dependencies
 │
 └── src/
-    ├── config/settings.py       # ⚙️ Configuraciones
-    ├── interface.py             # 🖥️ Interfaz Gradio
+    ├── config/settings.py       # ⚙️ Configurations
+    ├── interface.py             # 🖥️ Gradio interface
     └── utils/
-        ├── groq_client.py       # 🤖 Cliente GroqCloud
-        ├── rag_manager.py       # 📚 Sistema RAG
-        ├── safety.py            # 🚨 Detección crisis
-        └── prompts.py           # 💬 Formateo prompts
+        ├── groq_client.py       # 🤖 GroqCloud client
+        ├── rag_manager.py       # 📚 RAG system
+        ├── safety.py            # 🚨 Crisis detection
+        └── prompts.py           # 💬 Prompt formatting
 ```
 
-## 🛠️ Scripts Disponibles
+## 🛠️ Available Scripts
 
-| Script | Uso | Ejemplo |
-|--------|-----|---------|
-| `run_groq_assistant.py` | Interfaz web principal | `python run_groq_assistant.py --share` |
-| `test_groq_api.py` | Pruebas rápidas de API | `python test_groq_api.py -i` |
-| `check_groq_models.py` | Verificar modelos | `python check_groq_models.py` |
-| `manage_rag.py` | Gestión documentos RAG | `python manage_rag.py status` |
+| Script | Usage | Example |
+|--------|-------|---------|
+| `run_groq_assistant.py` | Main web interface | `python run_groq_assistant.py --share` |
+| `test_groq_api.py` | Quick API tests | `python test_groq_api.py -i` |
+| `check_groq_models.py` | Verify models | `python check_groq_models.py` |
+| `manage_rag.py` | RAG document management | `python manage_rag.py status` |
 
-### Ejemplos de uso:
+### Usage examples:
 
 ```bash
-# Interfaz web con puerto personalizado
+# Web interface with custom port
 python run_groq_assistant.py --port 8080 --share
 
-# Prueba rápida de API
-python test_groq_api.py -m "¿Cómo manejar la ansiedad?" -c Ansiedad
+# Quick API test
+python test_groq_api.py -m "How to manage anxiety?" -c Anxiety
 
-# Modo interactivo
+# Interactive mode
 python test_groq_api.py --interactive
 ```
 
-## 📚 Sistema RAG
+## 📚 RAG System
 
-### Configuración inicial:
+### Initial setup:
 ```bash
-python manage_rag.py create-examples  # Crear documentos ejemplo
-python manage_rag.py index            # Indexar documentos
-python manage_rag.py status           # Ver estado
-python manage_rag.py search "técnicas de respiración"  # Buscar en base de conocimientos
+python manage_rag.py create-examples  # Create example documents
+python manage_rag.py index            # Index documents
+python manage_rag.py status           # View status
+python manage_rag.py search "breathing techniques"  # Search knowledge base
 ```
 
-### Gestión de documentos:
+### Document management:
 ```bash
-python manage_rag.py search "ansiedad" --category Ansiedad
-python manage_rag.py add "Nuevo contenido" --title "Mi documento"
+python manage_rag.py search "anxiety" --category Anxiety
+python manage_rag.py add "New content" --title "My document"
 python manage_rag.py list-docs
 ```
 
-## ⚙️ Configuración
+## ⚙️ Configuration
 
-### Variables de entorno (.env):
+### Environment variables (.env):
 ```env
-GROQ_API_KEY=gsk_tu_clave_api_aquí
+GROQ_API_KEY=gsk_your_api_key_here
 RAG_ENABLED=true
 RAG_CHUNK_SIZE=1000
 RAG_SEARCH_K=3
 ```
 
-### Modelos disponibles:
-- `meta-llama/llama-4-scout-17b-16e-instruct` (recomendado)
+### Available models:
+- `meta-llama/llama-4-scout-17b-16e-instruct` (recommended)
 - `llama3-70b-8192`
 - `compound-beta`
 - `gemma2-9b-it`
 - `llama-3.3-70b-versatile`
 
-## 🛡️ Seguridad
+## 🛡️ Safety
 
-### Detección automática de crisis:
-- **Palabras clave de riesgo** suicida/autolesión
-- **Derivación inmediata** a servicios profesionales
-- **Protocolos de emergencia** integrados
+### Automatic crisis detection:
+- **Risk keywords** for suicide/self-harm
+- **Immediate referral** to professional services
+- **Integrated emergency protocols**
 
-### Números de emergencia (España):
-- **🚨 Emergencias**: 112
-- **💙 Prevención Suicidio**: 024
-- **🆘 Salud Mental**: 900 10 22 10
-- **👥 Violencia de Género**: 016
+### Emergency numbers (Spain):
+- **🚨 Emergencies**: 112
+- **💙 Suicide Prevention**: 024
+- **🆘 Mental Health Spain**: 900 10 22 10
+- **👥 Gender Violence**: 016
 
-## 🐛 Resolución de Problemas
+## 🐛 Troubleshooting
 
-### Problemas comunes y soluciones:
+### Common problems and solutions:
 
-#### Error de codificación en .env
+#### Encoding error in .env
 ```bash
-# Si ves errores de UTF-8, elimina y recrea el archivo .env
+# If you see UTF-8 errors, delete and recreate .env file
 del .env  # Windows
 rm .env   # Linux/Mac
 
-# Luego créalo manualmente con editor de texto (UTF-8)
+# Then create manually with text editor (UTF-8)
 ```
 
-#### Verificar configuración
+#### Verify configuration
 ```bash
-# Verificar conexión GroqCloud
+# Verify GroqCloud connection
 python check_groq_models.py
 
-# Verificar estado RAG
+# Verify RAG status
 python manage_rag.py status
 
-# Probar API básica
-python test_groq_api.py -m "Hola" --list-models
+# Test basic API
+python test_groq_api.py -m "Hello" --list-models
 ```
 
-#### Reindexar documentos RAG
+#### Reindex RAG documents
 ```bash
 python manage_rag.py clean
 python manage_rag.py create-examples
 python manage_rag.py index
 ```
 
-### Dependencias faltantes:
+### Missing dependencies:
 ```bash
-# Si falta FAISS
+# If FAISS is missing
 pip install faiss-cpu
 
-# Si falta SentenceTransformers
+# If SentenceTransformers is missing
 pip install sentence-transformers
 
-# Reinstalar todas las dependencias
+# Reinstall all dependencies
 pip install -r requirements.txt --force-reinstall
 ```
 
-## 📜 Licencia
+## 📜 License
 
-MIT License - Ver `LICENSE`
+MIT License - See `LICENSE`
 
-## ⚠️ Disclaimer Importante
+## ⚠️ Important Disclaimer
 
-**Este asistente NO reemplaza atención profesional de salud mental.**
+**This assistant does NOT replace professional mental health care.**
 
-En caso de emergencia, contacta inmediatamente:
-- **🚨 España**: 112 (Emergencias), 024 (Prevención Suicidio)
-- **🌍 Internacional**: Servicios de emergencia locales
+In case of emergency, contact immediately:
+- **🚨 Spain**: 112 (Emergencies), 024 (Suicide Prevention)
+- **🌍 International**: Local emergency services
 
 ---
 
-**Desarrollado con ❤️ para apoyar el bienestar mental de la comunidad**
+**Developed with ❤️ to support community mental wellness**
 
-*¿Dudas? [Abre un issue](https://github.com/Samuromarin/Mental-Health-Assistant/issues)*
+*Questions? [Open an issue](https://github.com/Samuromarin/Mental-Health-Assistant/issues)*
