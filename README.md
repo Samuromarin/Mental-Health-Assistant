@@ -123,19 +123,13 @@ python test_groq_api.py --interactive
 
 ## 📚 RAG System
 
-### Initial setup:
 ```bash
+python manage_rag.py status           # View status
 python manage_rag.py create-examples  # Create example documents
 python manage_rag.py index            # Index documents
-python manage_rag.py status           # View status
+python manage_rag.py list-docs        # List available documents
 python manage_rag.py search "breathing techniques"  # Search knowledge base
-```
-
-### Document management:
-```bash
-python manage_rag.py search "anxiety" --category Anxiety
-python manage_rag.py add "New content" --title "My document"
-python manage_rag.py list-docs
+python manage_rag.py add "New content" --title "My document"  # Add document from text
 ```
 
 ## ⚙️ Configuration
@@ -147,13 +141,6 @@ RAG_ENABLED=true
 RAG_CHUNK_SIZE=1000
 RAG_SEARCH_K=3
 ```
-
-### Available models:
-- `meta-llama/llama-4-scout-17b-16e-instruct` (recommended)
-- `llama3-70b-8192`
-- `compound-beta`
-- `gemma2-9b-it`
-- `llama-3.3-70b-versatile`
 
 ## 🛡️ Safety
 

@@ -9,7 +9,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
 # Model configuration
-DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # Latest model
+DEFAULT_MODEL = "gemma2-9b-it"  
 
 # RAG configuration with FAISS
 RAG_ENABLED = os.getenv("RAG_ENABLED", "true").lower() == "true"
@@ -53,6 +53,11 @@ EMERGENCY_NUMBERS = {
 
 # Available GroqCloud models configuration
 GROQ_MODELS = {
+    "gemma2-9b-it": {
+        "name": "Gemma 2 9B IT",
+        "context_length": 8192,
+        "description": "Google model optimized for instructions"
+    },
     "meta-llama/llama-4-scout-17b-16e-instruct": {
         "name": "Llama 4 Scout 17B",
         "context_length": 128000,
@@ -77,11 +82,6 @@ GROQ_MODELS = {
         "name": "Compound Beta",
         "context_length": 128000,
         "description": "Experimental Groq model with high performance"
-    },
-    "gemma2-9b-it": {
-        "name": "Gemma 2 9B IT",
-        "context_length": 8192,
-        "description": "Google model optimized for instructions"
     },
     "deepseek-r1-distill-llama-70b": {
         "name": "DeepSeek R1 Distill 70B",
