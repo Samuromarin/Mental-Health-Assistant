@@ -19,12 +19,12 @@ def get_crisis_response(keywords: List[str]) -> str:
     from src.config.settings import EMERGENCY_NUMBERS
     
     # Detect if it's high risk
-    high_risk_words = ["suicide", "kill myself", "end my life", "want to die", "self-harm", "cut myself", "hurt myself", "die", "end it all"]
+    high_risk_words = ["suicide", "kill myself", "I can't take it anymore", "end my life", "want to die", "self-harm", "cut myself", "hurt myself", "die", "end it all"]
     is_high_risk = any(word in keywords for word in high_risk_words)
     
     if is_high_risk:
         response = """
-🚨 **CRISIS SITUATION DETECTED**
+🚨 **CRISIS SITUATION DETECTED** 🚨
 
 I've detected that you might be at immediate risk. It's VERY IMPORTANT that you seek help NOW:
 
@@ -34,20 +34,32 @@ I've detected that you might be at immediate risk. It's VERY IMPORTANT that you 
 
 🆘 **If you're in danger, go to the nearest hospital**
         """
+        # Final message for HIGH RISK
+        final_message = """
+This assistant is not designed to handle crisis situations and does not replace 
+professional help. If you are in immediate danger, contact emergency services.
+
+Your life has value. You are not alone. 🧡
+        """
     else:
         response = """
-**Important safety message**
+⚠️ **Important safety message** ⚠️
 
-I've detected content that indicates you're going through a very difficult time.
-It's important that you know help is available:
+I notice you're going through some challenges right now, and I want you to know that support is here for you. 
+You don't have to face this alone:
+        """
+        # Final message for MODERATE RISK
+        final_message = """
+Remember, reaching out for help is a sign of strength. 
+These resources are here to provide you with professional guidance and support.
+
+You matter, and things can get better. 🧡
         """
     
     # Common resources for both cases
     response += f"""
 
-📞 **Help resources:**
-- Emergency Services: {EMERGENCY_NUMBERS['general']}
-- Suicide Prevention Line: {EMERGENCY_NUMBERS['suicide_prevention']} (24/7)
+🤝 **Help resources:**
 - Mental Health Spain: {EMERGENCY_NUMBERS['mental_health']}
 - ANAR Phone (youth): {EMERGENCY_NUMBERS['youth_phone']}
 - Online: {EMERGENCY_NUMBERS['online_chat']}
@@ -56,12 +68,8 @@ It's important that you know help is available:
     if "gender_violence" in EMERGENCY_NUMBERS and any(word in keywords for word in ["violence", "abuse", "mistreat"]):
         response += f"• Gender Violence: {EMERGENCY_NUMBERS['gender_violence']}\n"
     
-    response += """
-This assistant is not designed to handle crisis situations and does not replace 
-professional help. If you are in immediate danger, contact emergency services.
-
-Your life has value. You are not alone.
-    """
+    # Add the appropriate final message
+    response += final_message
     
     return response
 

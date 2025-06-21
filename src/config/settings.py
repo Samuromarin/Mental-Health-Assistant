@@ -32,12 +32,12 @@ os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "documents"), exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "faiss_index"), exist_ok=True)
 
-# Crisis detection keywords configuration (English)
+# Crisis detection keywords configuration
 CRISIS_KEYWORDS = [
     "suicide", "kill myself", "end my life", "don't want to live", 
-    "self-harm", "cut myself", "hurt myself", "die", "end everything",
+    "self-harm", "cut myself", "hurt myself", "die", "end everything", "end it all",
     "no point living", "nobody would miss me", "better without me",
-    "can't take it anymore", "can't go on", "want to die", "burden", "no way out", 
+    "I can't take it anymore", "can't go on", "want to die", "burden", "no way out", 
     "harm myself", "hurt myself", "hopeless", "goodbye forever", "can't resist anymore"
 ]
 
