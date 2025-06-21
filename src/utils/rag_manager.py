@@ -242,7 +242,8 @@ class RAGManager:
     def search_relevant_content(self, 
                               query: str, 
                               k: int = 3,
-                              category: str = None) -> List[Dict[str, Any]]:
+                              category: str = None,
+                              relevance_threshold: float = 1.0) -> List[Dict[str, Any]]:
         """
         Searches for relevant content for a query
         
@@ -250,6 +251,7 @@ class RAGManager:
             query: User query
             k: Number of results to return
             category: Mental health category (optional)
+            relevance_threshold: Maximum distance for relevant results
             
         Returns:
             List of relevant documents with metadata
@@ -273,10 +275,11 @@ class RAGManager:
             # Search in FAISS
             distances, indices = self.index.search(query_embedding.astype('float32'), k)
             
-            # Format results
+            # Format results with relevance filtering
             formatted_results = []
             for distance, idx in zip(distances[0], indices[0]):
-                if idx < len(self.documents):  # Verify valid index
+                # Only include results below threshold (more relevant)
+                if idx < len(self.documents) and distance < relevance_threshold:
                     formatted_results.append({
                         'content': self.documents[idx],
                         'metadata': self.metadata[idx],
@@ -284,7 +287,7 @@ class RAGManager:
                         'source': self.metadata[idx].get('source_file', 'unknown')
                     })
             
-            self.logger.info(f"Found {len(formatted_results)} relevant documents")
+            self.logger.info(f"Found {len(formatted_results)} relevant documents (threshold: {relevance_threshold})")
             return formatted_results
             
         except Exception as e:
@@ -306,11 +309,17 @@ class RAGManager:
         Returns:
             Relevant context as string
         """
-        # Search for relevant content
-        relevant_docs = self.search_relevant_content(query, k=3, category=category)
+        # Search for relevant content with stricter threshold
+        relevant_docs = self.search_relevant_content(
+            query, 
+            k=3, 
+            category=category, 
+            relevance_threshold=0.8  # Only very relevant documents
+        )
         
         if not relevant_docs:
-            return ""
+            self.logger.info("No relevant documents found above threshold")
+            return ""  # No context = No RAG note
         
         # Build context
         context_parts = []

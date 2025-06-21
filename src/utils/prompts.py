@@ -93,17 +93,6 @@ def get_category_specific_instructions(category):
         - Distinguish between constructive and destructive self-criticism.
         - Promote self-compassion as an alternative to self-criticism.
         - Suggest practices like writing gratitude journals or realistic affirmations.
-        """,
-        
-        "Relaxation techniques": """
-        For this relaxation techniques topic:
-        - Guide in deep breathing, progressive muscle relaxation, visualization, or mindfulness.
-        - Offer step-by-step instructions when appropriate.
-        - Adapt techniques to the user's specific context and preferences.
-        - Briefly explain the scientific basis of suggested techniques.
-        - Encourage regular practice, starting with short sessions.
-        - Ask about previous experiences with relaxation techniques.
-        - Offer alternatives if a particular technique doesn't resonate with the user.
         """
     }
     
@@ -177,10 +166,5 @@ def get_example_prompts():
             "I always compare myself to others and feel inferior",
             "How can I improve my self-image?",
             "I feel like I'm not good enough at anything"
-        ],
-        "Relaxation techniques": [
-            "I need techniques to calm down quickly",
-            "Could you guide me through a short meditation?",
-            "What breathing exercises do you recommend for anxiety?"
         ]
     }

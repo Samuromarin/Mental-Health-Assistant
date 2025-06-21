@@ -215,9 +215,8 @@ class GroqClient:
         if "choices" in response and len(response["choices"]) > 0:
             generated_response = response["choices"][0]["message"]["content"]
             
-            # Add note about sources if RAG was used
-            if (rag_context and "Relevant information from the knowledge base:" in rag_context
-                and len(rag_context.strip()) > 100):
+            # Add note only if RAG context was used
+            if rag_context:  # Si hay contexto RAG relevante, mostramos la nota
                 generated_response += "\n\n*Note: This response includes information from our specialized knowledge base.*"
             
             return generated_response

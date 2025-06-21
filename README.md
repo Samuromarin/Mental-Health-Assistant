@@ -77,7 +77,6 @@ Ready! Access at: **http://localhost:7860**
 | ⚡ **Stress** | Relaxation techniques, mindfulness |
 | 💕 **Relationships** | Communication, healthy boundaries |
 | 💪 **Self-esteem** | Personal strengthening, self-compassion |
-| 🧘 **Relaxation** | Mindfulness, breathing, meditation |
 
 ## 🏗️ Project Structure
 

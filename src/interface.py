@@ -153,11 +153,6 @@ def create_mental_health_interface():
             "I always compare myself to others and feel inferior",
             "How can I improve my self-image?",
             "What exercises can I do to strengthen my self-esteem?"
-        ],
-        "Relaxation techniques": [
-            "I would like to learn techniques to relax",
-            "Can you guide me through a short meditation?",
-            "What is progressive muscle relaxation and how is it practiced?"
         ]
     }
     
@@ -415,8 +410,7 @@ def create_mental_health_interface():
                 "Depression": "I've been feeling without energy and with little interest in things.",
                 "Stress": "Stress is affecting me a lot lately.",
                 "Relationships": "I'm having difficulties in my personal relationships.",
-                "Self-esteem": "I've noticed that I have very negative thoughts about myself.",
-                "Relaxation techniques": "I would like to learn some techniques to relax."
+                "Self-esteem": "I've noticed that I have very negative thoughts about myself."
             }
             
             return prompts.get(category, f"I would like to talk about {category.lower()}.")

@@ -41,7 +41,7 @@ def get_available_categories() -> List[str]:
         from src.config.settings import MENTAL_HEALTH_CATEGORIES
         return MENTAL_HEALTH_CATEGORIES
     except ImportError:
-        return ["General", "Anxiety", "Depression", "Stress", "Relationships", "Self-esteem", "Relaxation techniques"]
+        return ["General", "Anxiety", "Depression", "Stress", "Relationships", "Self-esteem"]
 
 def validate_category(category: str) -> str:
     """Validates that category exists or returns 'General'"""
