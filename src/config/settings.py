@@ -73,6 +73,11 @@ GROQ_MODELS = {
         "context_length": 8192,
         "description": "Large Llama 3 model with excellent performance"
     },
+    "qwen/qwen3-32b": {
+        "name": "Qwen 3 32B",
+        "context_length": 131072,  
+        "description": "Advanced model with reasoning and multilingual capabilities (100+ languages)"
+    },
     "llama-3.3-70b-versatile": {
         "name": "Llama 3.3 70B Versatile",
         "context_length": 8192,
