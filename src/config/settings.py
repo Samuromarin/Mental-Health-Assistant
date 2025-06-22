@@ -32,7 +32,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "documents"), exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, "faiss_index"), exist_ok=True)
 
-# Crisis detection keywords configuration
+# Crisis detection keywords 
 CRISIS_KEYWORDS = [
     "suicide", "kill myself", "end my life", "don't want to live", 
     "self-harm", "cut myself", "hurt myself", "die", "end everything", "end it all",
@@ -51,7 +51,7 @@ EMERGENCY_NUMBERS = {
     "online_chat": "https://www.telefonodelaesperanza.org/"
 }
 
-# Available GroqCloud models configuration
+# Available GroqCloud models 
 GROQ_MODELS = {
     "gemma2-9b-it": {
         "name": "Gemma 2 9B IT",
@@ -100,7 +100,7 @@ GROQ_MODELS = {
     }
 }
 
-# Mental health categories configuration
+# Mental health categories 
 MENTAL_HEALTH_CATEGORIES = [
     "General",
     "Anxiety",

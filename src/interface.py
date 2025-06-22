@@ -220,7 +220,7 @@ def create_mental_health_interface():
         # Chat area
         with gr.Row():
             chatbot = gr.Chatbot(
-                height=600, 
+                height=400, 
                 show_label=False,
                 elem_classes="chat-container",
                 avatar_images=(None,None),

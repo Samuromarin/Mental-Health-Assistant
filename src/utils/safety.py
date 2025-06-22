@@ -4,11 +4,20 @@ Safety module to detect crisis messages and handle them appropriately
 
 from typing import Tuple, List
 
+import re
+
 def detect_crisis(message: str) -> Tuple[bool, List[str]]:
     from src.config.settings import CRISIS_KEYWORDS
     
     message_lower = message.lower()
-    keywords_found = [word for word in CRISIS_KEYWORDS if word in message_lower]
+    
+    # Buscar palabras completas en lugar de subcadenas
+    keywords_found = []
+    for keyword in CRISIS_KEYWORDS:
+        # Usar regex para buscar palabra completa con límites de palabra
+        pattern = r'\b' + re.escape(keyword) + r'\b'
+        if re.search(pattern, message_lower):
+            keywords_found.append(keyword)
     
     return bool(keywords_found), keywords_found
 
