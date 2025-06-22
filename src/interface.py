@@ -345,12 +345,14 @@ def create_mental_health_interface():
                 start_time = time.time()
                 
                 try:
+                    # 🔧 FIX: Pass conversation history to maintain context
                     response = groq.generate_mental_health_response(
                         message, 
                         category=category,
                         model_id=model,
                         temperature=temp,
-                        max_tokens=int(tokens)
+                        max_tokens=int(tokens),
+                        conversation_history=state_data["history"][:-1]  # Exclude current message
                     )
                     
                     history[-1] = {"role": "assistant", "content": response}

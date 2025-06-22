@@ -153,9 +153,10 @@ class GroqClient:
                                        model_id: Optional[str] = None,
                                        temperature: float = 0.7, 
                                        max_tokens: int = 500,
-                                       use_rag: bool = True) -> str:
+                                       use_rag: bool = True,
+                                       conversation_history: List[Dict[str, str]] = None) -> str:
         """
-        Generates a specific mental health response with RAG support
+        Generates a specific mental health response with RAG support and conversation history
         
         Args:
             user_message: User message
@@ -164,6 +165,7 @@ class GroqClient:
             temperature: Temperature for generation. Default 0.7.
             max_tokens: Maximum tokens to generate. Default 500.
             use_rag: Whether to use RAG for this query
+            conversation_history: Previous conversation history
             
         Returns:
             Generated response as text
@@ -197,11 +199,17 @@ class GroqClient:
         if rag_context:
             enhanced_system_message += f"\n\n{rag_context}\n\nUse this information when relevant to answer the user's query."
         
-        # Create message list
-        messages = [
-            {"role": "system", "content": enhanced_system_message},
-            {"role": "user", "content": user_message}
-        ]
+        # 🔧 FIX: Build complete message list with conversation history
+        messages = [{"role": "system", "content": enhanced_system_message}]
+        
+        # Add conversation history if provided
+        if conversation_history:
+            # Limit history to avoid token limits (keep last 20 messages = 10 exchanges)
+            recent_history = conversation_history[-20:]
+            messages.extend(recent_history)
+        
+        # Add current user message
+        messages.append({"role": "user", "content": user_message})
         
         # Send the request
         response = self.chat_completion(
