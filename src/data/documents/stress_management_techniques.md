@@ -24,12 +24,3 @@
 
 ### Purpose:
 Reconnect with the present and exit anxious thoughts.
-
-## Express Mindfulness (3 minutes)
-
-### Quick steps:
-1. **Minute 1**: Focus on your breathing
-2. **Minute 2**: Notice body sensations
-3. **Minute 3**: Expand awareness to surroundings
-
-Perfect for work breaks or moments of tension.
