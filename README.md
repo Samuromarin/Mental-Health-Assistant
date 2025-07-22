@@ -1,6 +1,6 @@
 # 🧠 Mental Health Assistant
 
-Advanced AI-powered mental health support system combining Large Language Models (LLMs) with Retrieval-Augmented Generation (RAG) for evidence-based therapeutic assistance
+AI-powered mental health support system combining Large Language Models (LLMs) with Retrieval-Augmented Generation (RAG) for evidence-based therapeutic assistance
 
 ## ✨ Features
 
