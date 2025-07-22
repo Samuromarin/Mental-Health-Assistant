@@ -4,8 +4,8 @@ AI-powered mental health support system combining Large Language Models (LLMs) w
 
 ## ✨ Features
 
-- **🤖 Intuitive web interface** with Gradio
 - **🎯 6 specialized categories** for mental health
+- **🤖 Intuitive web interface** with Gradio
 - **📚 RAG system** for enriched responses
 - **🚨 Automatic crisis detection** with safety protocols
 - **⚡ Multiple LLM models** from GroqCloud
