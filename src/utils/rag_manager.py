@@ -13,9 +13,12 @@ import numpy as np
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
+from src.config.settings import RAG_CONFIG
+
 # LangChain imports
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
+
 
 # FAISS and SentenceTransformers imports
 try:
