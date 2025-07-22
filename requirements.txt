@@ -1,0 +1,14 @@
+python-dotenv>=1.0.0
+requests>=2.25.0
+gradio>=3.32.0
+pillow>=9.0.0
+typing-extensions>=4.0.0
+
+# Dependencias para RAG con FAISS
+langchain>=0.2.0
+langchain-community>=0.2.0
+sentence-transformers>=2.2.2
+faiss-cpu>=1.7.4
+pypdf>=3.17.0
+docx2txt>=0.8
+numpy>=1.21.0
